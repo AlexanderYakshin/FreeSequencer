@@ -22,8 +22,10 @@ namespace FreeSequencer.Editor
 		private BaseEvent _currentSeqEvent;
 		private BaseTrack _currentTrack;
 		private SequencerEditorWindow _editorWindow;
+		private int _minFrame;
+		private int _maxFrame;
 
-		public void Init(string seqName, int frameRate, int length, GameObject gameObject = null, BaseTrack track = null, BaseEvent seqEvent = null)
+		public void Init(string seqName, int frameRate, int length, int minFrame, int maxFrame, GameObject gameObject = null, BaseTrack track = null, BaseEvent seqEvent = null)
 		{
 			_seqName = seqName;
 			_frameRate = frameRate;
@@ -31,6 +33,8 @@ namespace FreeSequencer.Editor
 			_selectedGameObject = gameObject;
 			_currentSeqEvent = seqEvent;
 			_currentTrack = track;
+			_minFrame = minFrame;
+			_maxFrame = maxFrame;
 			if (_editorWindow == null)
 				_editorWindow = EditorWindow.GetWindow<SequencerEditorWindow>();
 		}
@@ -61,7 +65,7 @@ namespace FreeSequencer.Editor
 			EditorGUI.BeginChangeCheck();
 			EditorGUILayout.LabelField("S:", GUILayout.Width(15f));
 			var start = EditorGUILayout.IntField(seqEvent.StartFrame);
-			seqEvent.StartFrame = Mathf.Clamp(start, 0, seqEvent.EndFrame - 1);
+			seqEvent.StartFrame = Mathf.Clamp(start, _minFrame, seqEvent.EndFrame - 1);
 			EditorGUILayout.LabelField("E:", GUILayout.Width(15f));
 			var end = EditorGUILayout.IntField(seqEvent.EndFrame);
 			seqEvent.EndFrame = Mathf.Clamp(end, seqEvent.StartFrame + 1, _length);
@@ -73,18 +77,22 @@ namespace FreeSequencer.Editor
 			float _min = seqEvent.StartFrame;
 			float _max = seqEvent.EndFrame;
 			EditorGUILayout.MinMaxSlider(ref _min, ref _max, 0, _length);
-			seqEvent.StartFrame = Mathf.Clamp((int)_min, 0, _length - 1);
-			seqEvent.EndFrame = Mathf.Clamp((int)_max, seqEvent.StartFrame + 1, _length);
+			seqEvent.StartFrame = Mathf.Clamp((int)_min, _minFrame, seqEvent.EndFrame - 1);
+			seqEvent.EndFrame = Mathf.Clamp((int)_max, seqEvent.StartFrame + 1, _maxFrame);
 			EditorGUILayout.EndHorizontal();
 			if (EditorGUI.EndChangeCheck())
 			{
 				_editorWindow.Repaint();
 			}
 			EditorGUILayout.BeginHorizontal();
+			EditorGUILayout.LabelField("Color", GUILayout.Width(150f));
+			seqEvent.EventInnerColor = EditorGUILayout.ColorField(seqEvent.EventInnerColor);
+			EditorGUILayout.EndHorizontal();
+			EditorGUILayout.BeginHorizontal();
 			EditorGUILayout.LabelField("AnimationClip", GUILayout.Width(150f));
 
 			var animationTrack = _currentTrack as AnimationTrack;
-			if (animationTrack.Controller == null)
+			if (animationTrack != null && animationTrack.Controller == null)
 			{
 				EditorGUILayout.LabelField("Create Controller First");
 				EditorGUILayout.EndHorizontal();
@@ -144,8 +152,15 @@ namespace FreeSequencer.Editor
 
 			EditorGUILayout.BeginHorizontal();
 
-			EditorGUILayout.LabelField("Show Transf Path", GUILayout.Width(150f));
+			EditorGUILayout.LabelField("Show Transform Path", GUILayout.Width(150f));
 			_currentTrack.ShowTransformPath = EditorGUILayout.Toggle(_currentTrack.ShowTransformPath);
+
+			EditorGUILayout.EndHorizontal();
+
+			EditorGUILayout.BeginHorizontal();
+
+			EditorGUILayout.LabelField("Show Key Frames", GUILayout.Width(150f));
+			_currentTrack.ShowKeyFrames = EditorGUILayout.Toggle(_currentTrack.ShowKeyFrames);
 
 			EditorGUILayout.EndHorizontal();
 

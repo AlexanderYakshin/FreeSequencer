@@ -10,5 +10,11 @@ namespace FreeSequencer.Events
 	public class AnimationSeqEvent:BaseEvent
 	{
 		public AnimationClip Clip;
+		public bool ControlAnimation;
+
+		public AnimationSeqEvent()
+		{
+			ControlAnimation = true;
+		}
 	}
 }
