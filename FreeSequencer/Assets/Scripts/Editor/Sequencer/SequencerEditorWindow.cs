@@ -743,7 +743,7 @@ namespace FreeSequencer.Editor
 							keyPointsY.RemoveAll(key => Math.Abs(key.time - keyframeY.time) < 0.001f);
 						}
 						keyPointsY.Add(keyframeY);
-						if (!keyPointsZ.Any(key => Math.Abs(key.time - keyframeZ.time) < 0.001f))
+						if (keyPointsZ.Any(key => Math.Abs(key.time - keyframeZ.time) < 0.001f))
 						{
 							keyPointsZ.RemoveAll(key => Math.Abs(key.time - keyframeZ.time) < 0.001f);
 						}
@@ -815,7 +815,7 @@ namespace FreeSequencer.Editor
 							keyPointsY.RemoveAll(key => Math.Abs(key.time - keyframeY.time) < 0.001f);
 						}
 						keyPointsY.Add(keyframeY);
-						if (!keyPointsZ.Any(key => Math.Abs(key.time - keyframeZ.time) < 0.001f))
+						if (keyPointsZ.Any(key => Math.Abs(key.time - keyframeZ.time) < 0.001f))
 						{
 							keyPointsZ.RemoveAll(key => Math.Abs(key.time - keyframeZ.time) < 0.001f);
 						}
@@ -836,7 +836,7 @@ namespace FreeSequencer.Editor
 					}
 					else
 					{
-						keyPointsX.Add(keyframe);
+						keyPointsY.Add(keyframe);
 					}
 				}
 
@@ -868,11 +868,11 @@ namespace FreeSequencer.Editor
 						if (curveX.keys.Any(key => Math.Abs(key.time - keyframe.time) < 0.001f))
 						{
 							keyframeX = curveX.keys.FirstOrDefault(key1 => Math.Abs(key1.time - keyframe.time) < 0.001f);
-							keyframeX = new Keyframe(keyframeX.time, vector.z) { inTangent = keyframeX.inTangent, outTangent = keyframeX.outTangent, tangentMode = keyframeX.tangentMode };
+							keyframeX = new Keyframe(keyframeX.time, vector.x) { inTangent = keyframeX.inTangent, outTangent = keyframeX.outTangent, tangentMode = keyframeX.tangentMode };
 						}
 						else
 						{
-							keyframeX = new Keyframe(keyframe.time, vector.z);
+							keyframeX = new Keyframe(keyframe.time, vector.x);
 						}
 						keyPointsX.AddRange(curveX.keys);
 						keyPointsY.AddRange(curveY.keys);
@@ -887,7 +887,7 @@ namespace FreeSequencer.Editor
 							keyPointsY.RemoveAll(key => Math.Abs(key.time - keyframeY.time) < 0.001f);
 						}
 						keyPointsY.Add(keyframeY);
-						if (!keyPointsZ.Any(key => Math.Abs(key.time - keyframeZ.time) < 0.001f))
+						if (keyPointsZ.Any(key => Math.Abs(key.time - keyframeZ.time) < 0.001f))
 						{
 							keyPointsZ.RemoveAll(key => Math.Abs(key.time - keyframeZ.time) < 0.001f);
 						}
@@ -908,7 +908,7 @@ namespace FreeSequencer.Editor
 					}
 					else
 					{
-						keyPointsX.Add(keyframe);
+						keyPointsZ.Add(keyframe);
 					}
 				}
 			}
