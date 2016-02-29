@@ -693,19 +693,22 @@ namespace FreeSequencer.Editor
 				List<Keyframe> keyPointsX = new List<Keyframe>();
 				List<Keyframe> keyPointsY = new List<Keyframe>();
 				List<Keyframe> keyPointsZ = new List<Keyframe>();
-				bool pointChanged = false;
+
+				List<float> keyTimes = new List<float>();
 				foreach (Keyframe keyframe in curveX.keys.OrderBy(key => key.time))
 				{
+					if (keyTimes.Any(t => Math.Abs(t - keyframe.time) < 0.001f))
+						continue;
 					var valueX = curveX.Evaluate(keyframe.time);
 					var valueY = curveY.Evaluate(keyframe.time);
 					var valueZ = curveZ.Evaluate(keyframe.time);
 
-					var vector = new Vector3(valueX, valueY, valueZ);
+					var oldvector = new Vector3(valueX, valueY, valueZ);
+					keyTimes.Add(keyframe.time);
 					EditorGUI.BeginChangeCheck();
-					vector = Handles.DoPositionHandle(vector, Quaternion.identity);
+					var vector = Handles.DoPositionHandle(oldvector, Quaternion.identity);
 					if (EditorGUI.EndChangeCheck())
 					{
-						pointChanged = true;
 						Keyframe keyframeX = new Keyframe(keyframe.time, vector.x) {inTangent = keyframe.inTangent, outTangent = keyframe.outTangent, tangentMode = keyframe.tangentMode};
 						Keyframe keyframeY;
 						if (curveY.keys.Any(key => Math.Abs(key.time - keyframe.time) < 0.001f))
@@ -727,7 +730,9 @@ namespace FreeSequencer.Editor
 						{
 							keyframeZ = new Keyframe(keyframe.time, vector.z);
 						}
-
+						keyPointsX.AddRange(curveX.keys);
+						keyPointsY.AddRange(curveY.keys);
+						keyPointsZ.AddRange(curveZ.keys);
 						if (keyPointsX.Any(key => Math.Abs(key.time - keyframeX.time) < 0.001f))
 						{
 							keyPointsX.RemoveAll(key => Math.Abs(key.time - keyframeX.time) < 0.001f);
@@ -743,6 +748,19 @@ namespace FreeSequencer.Editor
 							keyPointsZ.RemoveAll(key => Math.Abs(key.time - keyframeZ.time) < 0.001f);
 						}
 						keyPointsZ.Add(keyframeZ);
+
+						curveX.keys = keyPointsX.ToArray();
+						AnimationUtility.SetEditorCurve(animEvent.Clip, curveBindingX, curveX);
+
+						curveY.keys = keyPointsY.ToArray();
+						AnimationUtility.SetEditorCurve(animEvent.Clip, curveBindingY, curveY);
+
+						curveZ.keys = keyPointsZ.ToArray();
+						AnimationUtility.SetEditorCurve(animEvent.Clip, curveBindingZ, curveZ);
+
+						animEvent.Clip.EnsureQuaternionContinuity();
+
+						return;
 					}
 					else
 					{
@@ -752,16 +770,17 @@ namespace FreeSequencer.Editor
 
 				foreach (Keyframe keyframe in curveY.keys)
 				{
+					if (keyTimes.Any(t => Math.Abs(t - keyframe.time) < 0.001f))
+						continue;
 					var valueX = curveX.Evaluate(keyframe.time);
 					var valueY = curveY.Evaluate(keyframe.time);
 					var valueZ = curveZ.Evaluate(keyframe.time);
 
-					var vector = new Vector3(valueX, valueY, valueZ);
+					var oldvector = new Vector3(valueX, valueY, valueZ);
 					EditorGUI.BeginChangeCheck();
-					vector = Handles.DoPositionHandle(vector, Quaternion.identity);
+					var vector = Handles.DoPositionHandle(oldvector, Quaternion.identity);
 					if (EditorGUI.EndChangeCheck())
 					{
-						pointChanged = true;
 						Keyframe keyframeY = new Keyframe(keyframe.time, vector.y) { inTangent = keyframe.inTangent, outTangent = keyframe.outTangent, tangentMode = keyframe.tangentMode };
 						Keyframe keyframeX;
 						if (curveX.keys.Any(key => Math.Abs(key.time - keyframe.time) < 0.001f))
@@ -783,19 +802,37 @@ namespace FreeSequencer.Editor
 						{
 							keyframeZ = new Keyframe(keyframe.time, vector.z);
 						}
-
-						if (!keyPointsX.Any(key => Math.Abs(key.time - keyframeX.time) < 0.001f))
+						keyPointsX.AddRange(curveX.keys);
+						keyPointsY.AddRange(curveY.keys);
+						keyPointsZ.AddRange(curveZ.keys);
+						if (keyPointsX.Any(key => Math.Abs(key.time - keyframeX.time) < 0.001f))
 						{
-							keyPointsX.Add(keyframeX);
+							keyPointsX.RemoveAll(key => Math.Abs(key.time - keyframeX.time) < 0.001f);
 						}
-						if (!keyPointsY.Any(key => Math.Abs(key.time - keyframeY.time) < 0.001f))
+						keyPointsX.Add(keyframeX);
+						if (keyPointsY.Any(key => Math.Abs(key.time - keyframeY.time) < 0.001f))
 						{
-							keyPointsY.Add(keyframeY);
+							keyPointsY.RemoveAll(key => Math.Abs(key.time - keyframeY.time) < 0.001f);
 						}
+						keyPointsY.Add(keyframeY);
 						if (!keyPointsZ.Any(key => Math.Abs(key.time - keyframeZ.time) < 0.001f))
 						{
-							keyPointsZ.Add(keyframeZ);
+							keyPointsZ.RemoveAll(key => Math.Abs(key.time - keyframeZ.time) < 0.001f);
 						}
+						keyPointsZ.Add(keyframeZ);
+
+						curveX.keys = keyPointsX.ToArray();
+						AnimationUtility.SetEditorCurve(animEvent.Clip, curveBindingX, curveX);
+
+						curveY.keys = keyPointsY.ToArray();
+						AnimationUtility.SetEditorCurve(animEvent.Clip, curveBindingY, curveY);
+
+						curveZ.keys = keyPointsZ.ToArray();
+						AnimationUtility.SetEditorCurve(animEvent.Clip, curveBindingZ, curveZ);
+
+						animEvent.Clip.EnsureQuaternionContinuity();
+
+						return;
 					}
 					else
 					{
@@ -805,16 +842,17 @@ namespace FreeSequencer.Editor
 
 				foreach (Keyframe keyframe in curveZ.keys)
 				{
+					if (keyTimes.Any(t => Math.Abs(t - keyframe.time) < 0.001f))
+						continue;
 					var valueX = curveX.Evaluate(keyframe.time);
 					var valueY = curveY.Evaluate(keyframe.time);
 					var valueZ = curveZ.Evaluate(keyframe.time);
 
-					var vector = new Vector3(valueX, valueY, valueZ);
+					var oldvector = new Vector3(valueX, valueY, valueZ);
 					EditorGUI.BeginChangeCheck();
-					vector = Handles.DoPositionHandle(vector, Quaternion.identity);
+					var vector = Handles.DoPositionHandle(oldvector, Quaternion.identity);
 					if (EditorGUI.EndChangeCheck())
 					{
-						pointChanged = true;
 						Keyframe keyframeZ = new Keyframe(keyframe.time, vector.z) { inTangent = keyframe.inTangent, outTangent = keyframe.outTangent, tangentMode = keyframe.tangentMode };
 						Keyframe keyframeY;
 						if (curveY.keys.Any(key => Math.Abs(key.time - keyframe.time) < 0.001f))
@@ -836,38 +874,42 @@ namespace FreeSequencer.Editor
 						{
 							keyframeX = new Keyframe(keyframe.time, vector.z);
 						}
-
-						if (!keyPointsX.Any(key => Math.Abs(key.time - keyframeX.time) < 0.001f))
+						keyPointsX.AddRange(curveX.keys);
+						keyPointsY.AddRange(curveY.keys);
+						keyPointsZ.AddRange(curveZ.keys);
+						if (keyPointsX.Any(key => Math.Abs(key.time - keyframeX.time) < 0.001f))
 						{
-							keyPointsX.Add(keyframeX);
+							keyPointsX.RemoveAll(key => Math.Abs(key.time - keyframeX.time) < 0.001f);
 						}
-						if (!keyPointsY.Any(key => Math.Abs(key.time - keyframeY.time) < 0.001f))
+						keyPointsX.Add(keyframeX);
+						if (keyPointsY.Any(key => Math.Abs(key.time - keyframeY.time) < 0.001f))
 						{
-							keyPointsY.Add(keyframeY);
+							keyPointsY.RemoveAll(key => Math.Abs(key.time - keyframeY.time) < 0.001f);
 						}
+						keyPointsY.Add(keyframeY);
 						if (!keyPointsZ.Any(key => Math.Abs(key.time - keyframeZ.time) < 0.001f))
 						{
-							keyPointsZ.Add(keyframeZ);
+							keyPointsZ.RemoveAll(key => Math.Abs(key.time - keyframeZ.time) < 0.001f);
 						}
+						keyPointsZ.Add(keyframeZ);
+
+						curveX.keys = keyPointsX.ToArray();
+						AnimationUtility.SetEditorCurve(animEvent.Clip, curveBindingX, curveX);
+
+						curveY.keys = keyPointsY.ToArray();
+						AnimationUtility.SetEditorCurve(animEvent.Clip, curveBindingY, curveY);
+
+						curveZ.keys = keyPointsZ.ToArray();
+						AnimationUtility.SetEditorCurve(animEvent.Clip, curveBindingZ, curveZ);
+
+						animEvent.Clip.EnsureQuaternionContinuity();
+
+						return;
 					}
 					else
 					{
 						keyPointsX.Add(keyframe);
 					}
-				}
-
-				if (pointChanged)
-				{
-					curveX.keys = keyPointsX.ToArray();
-					AnimationUtility.SetEditorCurve(animEvent.Clip, curveBindingX, curveX);
-
-					curveY.keys = keyPointsX.ToArray();
-					AnimationUtility.SetEditorCurve(animEvent.Clip, curveBindingY, curveY);
-
-					curveZ.keys = keyPointsX.ToArray();
-					AnimationUtility.SetEditorCurve(animEvent.Clip, curveBindingZ, curveZ);
-
-					animEvent.Clip.EnsureQuaternionContinuity();
 				}
 			}
 		
