@@ -77,8 +77,13 @@ namespace FreeSequencer.Editor
 			float _min = seqEvent.StartFrame;
 			float _max = seqEvent.EndFrame;
 			EditorGUILayout.MinMaxSlider(ref _min, ref _max, 0, _length);
-			seqEvent.StartFrame = Mathf.Clamp((int)_min, _minFrame, seqEvent.EndFrame - 1);
-			seqEvent.EndFrame = Mathf.Clamp((int)_max, seqEvent.StartFrame + 1, _maxFrame);
+			if (!((int)_min < _minFrame && (int)_max != seqEvent.EndFrame 
+				|| (int)_max > _maxFrame && (int)_max != seqEvent.StartFrame))
+			{
+				seqEvent.StartFrame = Mathf.Clamp((int)_min, _minFrame, seqEvent.EndFrame - 1);
+				seqEvent.EndFrame = Mathf.Clamp((int)_max, seqEvent.StartFrame + 1, _maxFrame);
+			}
+				
 			EditorGUILayout.EndHorizontal();
 			if (EditorGUI.EndChangeCheck())
 			{

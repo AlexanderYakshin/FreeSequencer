@@ -39,6 +39,8 @@ namespace FreeSequencer.Editor
 			}
 		}
 
+		public int _minCurrentFrame;
+		public int _maxCurrentFrame;
 
 		public float modifier = 1.23f;
 		public float cursorTime;
@@ -126,9 +128,15 @@ namespace FreeSequencer.Editor
 				var sequenceNames = _sequences.Keys.ToArray<string>();
 				if (_seqIndex > sequenceNames.Length - 1)
 					_seqIndex = 0;
+				EditorGUI.BeginChangeCheck();
 				_seqIndex = EditorGUILayout.Popup(_seqIndex, sequenceNames, GUILayout.Width(200));
-				_selectedSequenceName = sequenceNames[_seqIndex];
-				_selectedSequence = _sequences[_selectedSequenceName];
+				if (EditorGUI.EndChangeCheck())
+				{
+					_selectedSequenceName = sequenceNames[_seqIndex];
+					_selectedSequence = _sequences[_selectedSequenceName];
+
+					_maxCurrentFrame = _selectedSequence.Length;
+				}
 			}
 			else
 			{
@@ -219,10 +227,6 @@ namespace FreeSequencer.Editor
 						{
 							DrawTrack(track, animatedGameObject, objectsCount * 22f);
 
-							foreach (BaseEvent baseEvent in track.Events)
-							{
-								
-							}
 							Handles.DrawLine(new Vector3(0, y_startGrid + objectsCount * 22f, 0f), new Vector3(x_endGrid, y_startGrid + objectsCount * 22f, 0f));
 							objectsCount++;
 						}
@@ -237,9 +241,10 @@ namespace FreeSequencer.Editor
 		{
 			_gridWidth = x_endGrid - x_startGrid;
 			_gridHeight = y_endGrid - y_startGrid;
-			x_dif = _gridWidth / _selectedSequence.Length;
+			var length = _maxCurrentFrame - _minCurrentFrame;
+			x_dif = _gridWidth / length;
 			koef = x_dif < 4f ? 10 : 1;
-			var framesCount = _selectedSequence.Length / koef;
+			var framesCount = length / koef;
 
 			Handles.color = Color.white;
 			var i = 0;
@@ -255,7 +260,7 @@ namespace FreeSequencer.Editor
 				Handles.DrawLine(new Vector3(x_startGrid + i * x_dif * koef, y_startGrid), new Vector3(x_startGrid + i * x_dif * koef, y_endGrid));
 				if (!_isPlaying && GetMouseDownRect(new Rect(x_startGrid + i * x_dif * koef - 2f, y_startGrid, 4f, _gridHeight)))
 				{
-					CurrentFrameNumber = i * koef;
+					CurrentFrameNumber = _minCurrentFrame + i * koef;
 				}
 				i++;
 			}
@@ -279,18 +284,18 @@ namespace FreeSequencer.Editor
 				i++;
 			}
 
-			if (!_isPlaying && GetMouseOverRect(new Rect(x_startGrid, y_startGrid, _gridWidth, _gridHeight + 35f)))
+			if (!_isPlaying && GetMouseOverRect(new Rect(x_startGrid, y_startGrid, _gridWidth, _gridHeight + 15f)))
 			{
 				Vector2 mousePosition = Event.current.mousePosition;
 				var frame = (mousePosition.x - x_startGrid) / x_dif;
-				CurrentFrameNumber = Mathf.CeilToInt(frame);
+				CurrentFrameNumber = _minCurrentFrame + Mathf.CeilToInt(frame);
 			}
 		}
 
 		private void DrawCursor()
 		{
-			x_dif = _gridWidth / _selectedSequence.Length;
-			var x = x_startGrid + x_dif * _currentFrameNumber;
+			x_dif = _gridWidth / (_maxCurrentFrame - _minCurrentFrame);
+			var x = x_startGrid + x_dif * (_currentFrameNumber - _minCurrentFrame);
 			Handles.color = Color.red;
 
 			Handles.DrawSolidDisc(new Vector3(x, y_endGrid + 2f), new Vector3(0, 0, 1f), 3f);
@@ -314,25 +319,29 @@ namespace FreeSequencer.Editor
 				toolsMenu.DropDown(new Rect(mousePos.x, mousePos.y, 0, 0));
 				GUIUtility.ExitGUI();
 			}
-			var lastEndFrame = 0;
+			var lastEndFrame = _minCurrentFrame;
 			var events = track.Events.OrderBy(evt => evt.StartFrame).ToList();
 			for (int i = 0; i < events.Count; i++)
 			{
 				var evt = events[i];
-				if (evt.StartFrame > lastEndFrame)
+				if (evt.EndFrame > _minCurrentFrame && evt.StartFrame < _maxCurrentFrame)
 				{
-					DrawEventMouseRect(lastEndFrame, evt.StartFrame - 1, startHeight, animatedGameObject, track);
-				}
+					if (evt.StartFrame > lastEndFrame)
+					{
+						DrawEventMouseRect(lastEndFrame, evt.StartFrame - 1, startHeight, animatedGameObject, track);
+					}
 
-				DrawEventMouseRect(evt.StartFrame, evt.EndFrame, startHeight, animatedGameObject, track, evt);
-				var min = lastEndFrame;
-				var max = i == events.Count - 1 ? _selectedSequence.Length : events[i + 1].StartFrame;
-				DrawEvent(evt, track, animatedGameObject.GameObject, startHeight, min, max);
 
-				lastEndFrame = evt.EndFrame;
-				if (i == events.Count - 1 && lastEndFrame < _selectedSequence.Length - 1)
-				{
-					DrawEventMouseRect(lastEndFrame, _selectedSequence.Length - 1, startHeight, animatedGameObject, track);
+					DrawEventMouseRect(evt.StartFrame, evt.EndFrame, startHeight, animatedGameObject, track, evt, i);
+					var min = lastEndFrame;
+					var max = i == events.Count - 1 ? _selectedSequence.Length : events[i + 1].StartFrame;
+					DrawEvent(evt, track, animatedGameObject.GameObject, startHeight, min, max);
+
+					lastEndFrame = evt.EndFrame;
+					if (i == events.Count - 1 && lastEndFrame < _selectedSequence.Length - 1)
+					{
+						DrawEventMouseRect(lastEndFrame, _selectedSequence.Length - 1, startHeight, animatedGameObject, track);
+					}
 				}
 			}
 			EditorGUILayout.EndHorizontal();
@@ -340,8 +349,10 @@ namespace FreeSequencer.Editor
 
 		private void DrawEvent(BaseEvent baseEvent, BaseTrack track, GameObject gameObject, float startHeight, int minFrame, int maxFrame)
 		{
-			var start = x_startGrid + x_dif * baseEvent.StartFrame;
-			var width = x_dif * (baseEvent.EndFrame - baseEvent.StartFrame);
+			var startFr = baseEvent.StartFrame < _minCurrentFrame ? _minCurrentFrame : baseEvent.StartFrame;
+			var endFr = baseEvent.EndFrame > _maxCurrentFrame ? _maxCurrentFrame : baseEvent.EndFrame;
+			var start = x_startGrid + x_dif * (startFr - _minCurrentFrame);
+			var width = x_dif * (endFr - startFr);
 			var rect = new Rect(start, startHeight, width, 20f);
 			var selectionColor = Color.white;
 			var color = baseEvent.EventInnerColor;
@@ -351,7 +362,7 @@ namespace FreeSequencer.Editor
 			Handles.DrawSolidRectangleWithOutline(rect, color, color);
 			Handles.color = color;
 			Handles.DrawSolidRectangleWithOutline(new Rect(rect.x + 2f, rect.y + 2f, rect.width - 4f, rect.height - 4f), color, color);
-			
+
 			if (_selectedEvent == baseEvent)
 			{
 				Handles.color = new Color(selectionColor.r, selectionColor.g, selectionColor.b, 0.3f);
@@ -372,9 +383,11 @@ namespace FreeSequencer.Editor
 			}
 		}
 
-		private void DrawEventMouseRect(int start, int end, float startHeight, AnimatedGameObject animatedGameObject, BaseTrack baseTrack, BaseEvent seqEvent = null)
+		private void DrawEventMouseRect(int start1, int end1, float startHeight, AnimatedGameObject animatedGameObject, BaseTrack baseTrack, BaseEvent seqEvent = null, int index = 0)
 		{
-			var st = x_startGrid + x_dif * start;
+			var start = start1 - _minCurrentFrame;
+			var end = end1 - _minCurrentFrame;
+			var st = x_startGrid + x_dif * (start);
 			var width = x_dif * (end - start);
 			var evtRect = new Rect(st, startHeight, width, 20f);
 
@@ -384,17 +397,49 @@ namespace FreeSequencer.Editor
 				GenericMenu toolsMenu = new GenericMenu();
 				if (seqEvent == null)
 				{
-					var holder = new AddEventHolder() { AnimatedGameObject = animatedGameObject, StartFrame = start, EndFrame = end, Track = baseTrack };
+					var holder = new AddEventHolder() { AnimatedGameObject = animatedGameObject, StartFrame = start1, EndFrame = end1, Track = baseTrack };
 					toolsMenu.AddItem(new GUIContent("Add animation event"), false, OnAddAnimationEvent, holder);
 				}
 				else
 				{
 					var holder = new RemoveEventHolder() { AnimatedGameObject = animatedGameObject, Track = baseTrack, Event = seqEvent };
-					toolsMenu.AddItem(new GUIContent("Remove animation event"), true, OnRemoveEvent, holder);
+					toolsMenu.AddItem(new GUIContent("Remove animation event"), false, OnRemoveEvent, holder);
+					var moveLeftHolder = new MoveHolder()
+					{
+						AnimatedGameObject = animatedGameObject,
+						Track = baseTrack,
+						Event = seqEvent,
+						MoveRight = false
+					};
+
+					var moveRightHolder = new MoveHolder()
+					{
+						AnimatedGameObject = animatedGameObject,
+						Track = baseTrack,
+						Event = seqEvent,
+						MoveRight = true
+					};
+					if (index > 0)
+						toolsMenu.AddItem(new GUIContent("Move left"), false, OnMove, moveLeftHolder);
+					if (index < baseTrack.Events.Count)
+						toolsMenu.AddItem(new GUIContent("Move right"), false, OnMove, moveRightHolder);
 				}
 
 				toolsMenu.DropDown(new Rect(mPos.x, mPos.y, 0, 0));
-				//GUIUtility.ExitGUI();
+			}
+		}
+
+		private void OnMove(object data)
+		{
+			var holder = data as MoveHolder;
+			if (holder == null)
+				return;
+
+			if (holder.MoveRight)
+			{
+				var nextEvent = holder.Track.Events.OrderBy(evt => evt.StartFrame)
+					.Where(evt => evt.StartFrame > holder.Event.StartFrame).FirstOrDefault();
+
 			}
 		}
 
@@ -545,11 +590,21 @@ namespace FreeSequencer.Editor
 
 			if (GUILayout.Button("|>", GUILayout.Width(30f)))
 			{
-				if (CurrentFrameNumber < _selectedSequence.Length)
+				if (CurrentFrameNumber < _maxCurrentFrame)
 					CurrentFrameNumber++;
 			}
 
 			EditorGUILayout.LabelField(CurrentFrameNumber.ToString(), GUILayout.Width(50f));
+
+			if (_selectedSequence != null)
+			{
+				float start = _minCurrentFrame;
+				float end = _maxCurrentFrame;
+
+				EditorGUILayout.MinMaxSlider(ref start, ref end, 0, _selectedSequence.Length);
+				_minCurrentFrame = (int)start;
+				_maxCurrentFrame = (int)end;
+			}
 
 
 			EditorGUILayout.EndHorizontal();
@@ -557,7 +612,7 @@ namespace FreeSequencer.Editor
 
 		private void OnPlayTick()
 		{
-			if (CurrentFrameNumber < _selectedSequence.Length)
+			if (CurrentFrameNumber < _maxCurrentFrame)
 			{
 				CurrentFrameNumber++;
 			}
@@ -690,10 +745,6 @@ namespace FreeSequencer.Editor
 				var curveY = AnimationUtility.GetEditorCurve(animEvent.Clip, curveBindingY);
 				var curveZ = AnimationUtility.GetEditorCurve(animEvent.Clip, curveBindingZ);
 
-				List<Keyframe> keyPointsX = new List<Keyframe>();
-				List<Keyframe> keyPointsY = new List<Keyframe>();
-				List<Keyframe> keyPointsZ = new List<Keyframe>();
-
 				List<float> keyTimes = new List<float>();
 				foreach (Keyframe keyframe in curveX.keys.OrderBy(key => key.time))
 				{
@@ -709,7 +760,7 @@ namespace FreeSequencer.Editor
 					var vector = Handles.DoPositionHandle(oldvector, Quaternion.identity);
 					if (EditorGUI.EndChangeCheck())
 					{
-						Keyframe keyframeX = new Keyframe(keyframe.time, vector.x) {inTangent = keyframe.inTangent, outTangent = keyframe.outTangent, tangentMode = keyframe.tangentMode};
+						Keyframe keyframeX = new Keyframe(keyframe.time, vector.x) { inTangent = keyframe.inTangent, outTangent = keyframe.outTangent, tangentMode = keyframe.tangentMode };
 						Keyframe keyframeY;
 						if (curveY.keys.Any(key => Math.Abs(key.time - keyframe.time) < 0.001f))
 						{
@@ -719,6 +770,38 @@ namespace FreeSequencer.Editor
 						else
 						{
 							keyframeY = new Keyframe(keyframe.time, vector.y);
+
+							var nextPoint = curveY.keys.OrderBy(key => key.time).SkipWhile(key => key.time > keyframe.time).Skip(1).FirstOrDefault();
+							var prevPoint = curveY.keys.OrderBy(key => key.time).TakeWhile(key => key.time > keyframe.time).LastOrDefault();
+							if (nextPoint.time == 0f)
+							{
+								keyframeY.outTangent = 0f;
+							}
+							else
+							{
+								var p1 = new Vector2(nextPoint.time, nextPoint.value);
+								var p2 = new Vector2(keyframeY.time, keyframeY.value);
+
+								var delta = p1 - p2;
+
+								keyframeY.outTangent = delta.y / delta.x;
+							}
+
+							if (prevPoint.time == 0f)
+							{
+								keyframeY.inTangent = 0f;
+							}
+							else
+							{
+								var p1 = new Vector2(prevPoint.time, prevPoint.value);
+								var p2 = new Vector2(keyframeY.time, keyframeY.value);
+
+								var delta = p2 - p1;
+
+								keyframeY.inTangent = delta.y / delta.x;
+							}
+
+							keyframeY.tangentMode = 10;
 						}
 						Keyframe keyframeZ;
 						if (curveZ.keys.Any(key => Math.Abs(key.time - keyframe.time) < 0.001f))
@@ -729,42 +812,82 @@ namespace FreeSequencer.Editor
 						else
 						{
 							keyframeZ = new Keyframe(keyframe.time, vector.z);
-						}
-						keyPointsX.AddRange(curveX.keys);
-						keyPointsY.AddRange(curveY.keys);
-						keyPointsZ.AddRange(curveZ.keys);
-						if (keyPointsX.Any(key => Math.Abs(key.time - keyframeX.time) < 0.001f))
-						{
-							keyPointsX.RemoveAll(key => Math.Abs(key.time - keyframeX.time) < 0.001f);
-						}
-						keyPointsX.Add(keyframeX);
-						if (keyPointsY.Any(key => Math.Abs(key.time - keyframeY.time) < 0.001f))
-						{
-							keyPointsY.RemoveAll(key => Math.Abs(key.time - keyframeY.time) < 0.001f);
-						}
-						keyPointsY.Add(keyframeY);
-						if (keyPointsZ.Any(key => Math.Abs(key.time - keyframeZ.time) < 0.001f))
-						{
-							keyPointsZ.RemoveAll(key => Math.Abs(key.time - keyframeZ.time) < 0.001f);
-						}
-						keyPointsZ.Add(keyframeZ);
+							var nextPoint = curveZ.keys.OrderBy(key => key.time).SkipWhile(key => key.time > keyframe.time).Skip(1).FirstOrDefault();
+							var prevPoint = curveZ.keys.OrderBy(key => key.time).TakeWhile(key => key.time > keyframe.time).LastOrDefault();
+							if (nextPoint.time == 0f)
+							{
+								keyframeZ.outTangent = 0f;
+							}
+							else
+							{
+								var p1 = new Vector2(nextPoint.time, nextPoint.value);
+								var p2 = new Vector2(keyframeZ.time, keyframeZ.value);
 
-						curveX.keys = keyPointsX.ToArray();
+								var delta = p1 - p2;
+
+								keyframeZ.outTangent = delta.y / delta.x;
+							}
+
+							if (prevPoint.time == 0f)
+							{
+								keyframeZ.inTangent = 0f;
+							}
+							else
+							{
+								var p1 = new Vector2(prevPoint.time, prevPoint.value);
+								var p2 = new Vector2(keyframeZ.time, keyframeZ.value);
+
+								var delta = p2 - p1;
+
+								keyframeZ.inTangent = delta.y / delta.x;
+							}
+
+							keyframeY.tangentMode = 10;
+						}
+
+						if (curveX.keys.Any(key => Math.Abs(key.time - keyframeX.time) < 0.001f))
+						{
+							var keyX = curveX.keys
+								.FirstOrDefault(key => Math.Abs(key.time - keyframeX.time) < 0.001f);
+							var index = Array.IndexOf(curveX.keys, keyX);
+							curveX.MoveKey(index, keyframeX);
+						}
+						else
+						{
+							curveX.AddKey(keyframeX);
+						}
+
+						if (curveY.keys.Any(key => Math.Abs(key.time - keyframeY.time) < 0.001f))
+						{
+							var keyY = curveY.keys
+								.FirstOrDefault(key => Math.Abs(key.time - keyframeY.time) < 0.001f);
+							var index = Array.IndexOf(curveY.keys, keyY);
+							curveY.MoveKey(index, keyframeY);
+						}
+						else
+						{
+							curveY.AddKey(keyframeY);
+						}
+
+						if (curveZ.keys.Any(key => Math.Abs(key.time - keyframeZ.time) < 0.001f))
+						{
+							var keyZ = curveZ.keys
+								.FirstOrDefault(key => Math.Abs(key.time - keyframeZ.time) < 0.001f);
+							var index = Array.IndexOf(curveZ.keys, keyZ);
+							curveZ.MoveKey(index, keyframeZ);
+						}
+						else
+						{
+							curveZ.AddKey(keyframeZ);
+						}
+
 						AnimationUtility.SetEditorCurve(animEvent.Clip, curveBindingX, curveX);
-
-						curveY.keys = keyPointsY.ToArray();
 						AnimationUtility.SetEditorCurve(animEvent.Clip, curveBindingY, curveY);
-
-						curveZ.keys = keyPointsZ.ToArray();
 						AnimationUtility.SetEditorCurve(animEvent.Clip, curveBindingZ, curveZ);
 
 						animEvent.Clip.EnsureQuaternionContinuity();
 
 						return;
-					}
-					else
-					{
-						keyPointsX.Add(keyframe);
 					}
 				}
 
@@ -777,6 +900,7 @@ namespace FreeSequencer.Editor
 					var valueZ = curveZ.Evaluate(keyframe.time);
 
 					var oldvector = new Vector3(valueX, valueY, valueZ);
+					keyTimes.Add(keyframe.time);
 					EditorGUI.BeginChangeCheck();
 					var vector = Handles.DoPositionHandle(oldvector, Quaternion.identity);
 					if (EditorGUI.EndChangeCheck())
@@ -791,6 +915,38 @@ namespace FreeSequencer.Editor
 						else
 						{
 							keyframeX = new Keyframe(keyframe.time, vector.x);
+
+							var nextPoint = curveX.keys.OrderBy(key => key.time).SkipWhile(key => key.time > keyframe.time).Skip(1).FirstOrDefault();
+							var prevPoint = curveX.keys.OrderBy(key => key.time).TakeWhile(key => key.time > keyframe.time).LastOrDefault();
+							if (nextPoint.time == 0f)
+							{
+								keyframeX.outTangent = 0f;
+							}
+							else
+							{
+								var p1 = new Vector2(nextPoint.time, nextPoint.value);
+								var p2 = new Vector2(keyframeX.time, keyframeX.value);
+
+								var delta = p1 - p2;
+
+								keyframeX.outTangent = delta.y / delta.x;
+							}
+
+							if (prevPoint.time == 0f)
+							{
+								keyframeX.inTangent = 0f;
+							}
+							else
+							{
+								var p1 = new Vector2(prevPoint.time, prevPoint.value);
+								var p2 = new Vector2(keyframeX.time, keyframeX.value);
+
+								var delta = p2 - p1;
+
+								keyframeX.inTangent = delta.y / delta.x;
+							}
+
+							keyframeX.tangentMode = 10;
 						}
 						Keyframe keyframeZ;
 						if (curveZ.keys.Any(key => Math.Abs(key.time - keyframe.time) < 0.001f))
@@ -801,42 +957,82 @@ namespace FreeSequencer.Editor
 						else
 						{
 							keyframeZ = new Keyframe(keyframe.time, vector.z);
-						}
-						keyPointsX.AddRange(curveX.keys);
-						keyPointsY.AddRange(curveY.keys);
-						keyPointsZ.AddRange(curveZ.keys);
-						if (keyPointsX.Any(key => Math.Abs(key.time - keyframeX.time) < 0.001f))
-						{
-							keyPointsX.RemoveAll(key => Math.Abs(key.time - keyframeX.time) < 0.001f);
-						}
-						keyPointsX.Add(keyframeX);
-						if (keyPointsY.Any(key => Math.Abs(key.time - keyframeY.time) < 0.001f))
-						{
-							keyPointsY.RemoveAll(key => Math.Abs(key.time - keyframeY.time) < 0.001f);
-						}
-						keyPointsY.Add(keyframeY);
-						if (keyPointsZ.Any(key => Math.Abs(key.time - keyframeZ.time) < 0.001f))
-						{
-							keyPointsZ.RemoveAll(key => Math.Abs(key.time - keyframeZ.time) < 0.001f);
-						}
-						keyPointsZ.Add(keyframeZ);
+							var nextPoint = curveZ.keys.OrderBy(key => key.time).SkipWhile(key => key.time > keyframe.time).Skip(1).FirstOrDefault();
+							var prevPoint = curveZ.keys.OrderBy(key => key.time).TakeWhile(key => key.time > keyframe.time).LastOrDefault();
+							if (nextPoint.time == 0f)
+							{
+								keyframeZ.outTangent = 0f;
+							}
+							else
+							{
+								var p1 = new Vector2(nextPoint.time, nextPoint.value);
+								var p2 = new Vector2(keyframeZ.time, keyframeZ.value);
 
-						curveX.keys = keyPointsX.ToArray();
+								var delta = p1 - p2;
+
+								keyframeZ.outTangent = delta.y / delta.x;
+							}
+
+							if (prevPoint.time == 0f)
+							{
+								keyframeZ.inTangent = 0f;
+							}
+							else
+							{
+								var p1 = new Vector2(prevPoint.time, prevPoint.value);
+								var p2 = new Vector2(keyframeZ.time, keyframeZ.value);
+
+								var delta = p2 - p1;
+
+								keyframeZ.inTangent = delta.y / delta.x;
+							}
+
+							keyframeY.tangentMode = 10;
+						}
+
+						if (curveX.keys.Any(key => Math.Abs(key.time - keyframeX.time) < 0.001f))
+						{
+							var keyX = curveX.keys
+								.FirstOrDefault(key => Math.Abs(key.time - keyframeX.time) < 0.001f);
+							var index = Array.IndexOf(curveX.keys, keyX);
+							curveX.MoveKey(index, keyframeX);
+						}
+						else
+						{
+							curveX.AddKey(keyframeX);
+						}
+
+						if (curveY.keys.Any(key => Math.Abs(key.time - keyframeY.time) < 0.001f))
+						{
+							var keyY = curveY.keys
+								.FirstOrDefault(key => Math.Abs(key.time - keyframeY.time) < 0.001f);
+							var index = Array.IndexOf(curveY.keys, keyY);
+							curveY.MoveKey(index, keyframeY);
+						}
+						else
+						{
+							curveY.AddKey(keyframeY);
+						}
+
+						if (curveZ.keys.Any(key => Math.Abs(key.time - keyframeZ.time) < 0.001f))
+						{
+							var keyZ = curveZ.keys
+								.FirstOrDefault(key => Math.Abs(key.time - keyframeZ.time) < 0.001f);
+							var index = Array.IndexOf(curveZ.keys, keyZ);
+							curveZ.MoveKey(index, keyframeZ);
+						}
+						else
+						{
+							curveZ.AddKey(keyframeZ);
+						}
+
 						AnimationUtility.SetEditorCurve(animEvent.Clip, curveBindingX, curveX);
-
-						curveY.keys = keyPointsY.ToArray();
 						AnimationUtility.SetEditorCurve(animEvent.Clip, curveBindingY, curveY);
-
-						curveZ.keys = keyPointsZ.ToArray();
 						AnimationUtility.SetEditorCurve(animEvent.Clip, curveBindingZ, curveZ);
 
 						animEvent.Clip.EnsureQuaternionContinuity();
 
 						return;
-					}
-					else
-					{
-						keyPointsY.Add(keyframe);
 					}
 				}
 
@@ -849,21 +1045,12 @@ namespace FreeSequencer.Editor
 					var valueZ = curveZ.Evaluate(keyframe.time);
 
 					var oldvector = new Vector3(valueX, valueY, valueZ);
+					keyTimes.Add(keyframe.time);
 					EditorGUI.BeginChangeCheck();
 					var vector = Handles.DoPositionHandle(oldvector, Quaternion.identity);
 					if (EditorGUI.EndChangeCheck())
 					{
 						Keyframe keyframeZ = new Keyframe(keyframe.time, vector.z) { inTangent = keyframe.inTangent, outTangent = keyframe.outTangent, tangentMode = keyframe.tangentMode };
-						Keyframe keyframeY;
-						if (curveY.keys.Any(key => Math.Abs(key.time - keyframe.time) < 0.001f))
-						{
-							keyframeY = curveY.keys.FirstOrDefault(key1 => Math.Abs(key1.time - keyframe.time) < 0.001f);
-							keyframeY = new Keyframe(keyframeY.time, vector.y) { inTangent = keyframeY.inTangent, outTangent = keyframeY.outTangent, tangentMode = keyframeY.tangentMode };
-						}
-						else
-						{
-							keyframeY = new Keyframe(keyframe.time, vector.y);
-						}
 						Keyframe keyframeX;
 						if (curveX.keys.Any(key => Math.Abs(key.time - keyframe.time) < 0.001f))
 						{
@@ -873,46 +1060,129 @@ namespace FreeSequencer.Editor
 						else
 						{
 							keyframeX = new Keyframe(keyframe.time, vector.x);
-						}
-						keyPointsX.AddRange(curveX.keys);
-						keyPointsY.AddRange(curveY.keys);
-						keyPointsZ.AddRange(curveZ.keys);
-						if (keyPointsX.Any(key => Math.Abs(key.time - keyframeX.time) < 0.001f))
-						{
-							keyPointsX.RemoveAll(key => Math.Abs(key.time - keyframeX.time) < 0.001f);
-						}
-						keyPointsX.Add(keyframeX);
-						if (keyPointsY.Any(key => Math.Abs(key.time - keyframeY.time) < 0.001f))
-						{
-							keyPointsY.RemoveAll(key => Math.Abs(key.time - keyframeY.time) < 0.001f);
-						}
-						keyPointsY.Add(keyframeY);
-						if (keyPointsZ.Any(key => Math.Abs(key.time - keyframeZ.time) < 0.001f))
-						{
-							keyPointsZ.RemoveAll(key => Math.Abs(key.time - keyframeZ.time) < 0.001f);
-						}
-						keyPointsZ.Add(keyframeZ);
 
-						curveX.keys = keyPointsX.ToArray();
+							var nextPoint = curveX.keys.OrderBy(key => key.time).SkipWhile(key => key.time > keyframe.time).Skip(1).FirstOrDefault();
+							var prevPoint = curveX.keys.OrderBy(key => key.time).TakeWhile(key => key.time > keyframe.time).LastOrDefault();
+							if (nextPoint.time == 0f)
+							{
+								keyframeX.outTangent = 0f;
+							}
+							else
+							{
+								var p1 = new Vector2(nextPoint.time, nextPoint.value);
+								var p2 = new Vector2(keyframeX.time, keyframeX.value);
+
+								var delta = p1 - p2;
+
+								keyframeX.outTangent = delta.y / delta.x;
+							}
+
+							if (prevPoint.time == 0f)
+							{
+								keyframeX.inTangent = 0f;
+							}
+							else
+							{
+								var p1 = new Vector2(prevPoint.time, prevPoint.value);
+								var p2 = new Vector2(keyframeX.time, keyframeX.value);
+
+								var delta = p2 - p1;
+
+								keyframeX.inTangent = delta.y / delta.x;
+							}
+
+							keyframeX.tangentMode = 10;
+						}
+						Keyframe keyframeY;
+						if (curveY.keys.Any(key => Math.Abs(key.time - keyframe.time) < 0.001f))
+						{
+							keyframeY = curveY.keys.FirstOrDefault(key1 => Math.Abs(key1.time - keyframe.time) < 0.001f);
+							keyframeY = new Keyframe(keyframeY.time, vector.y) { inTangent = keyframeY.inTangent, outTangent = keyframeY.outTangent, tangentMode = keyframeY.tangentMode };
+						}
+						else
+						{
+							keyframeY = new Keyframe(keyframe.time, vector.y);
+
+							var nextPoint = curveY.keys.OrderBy(key => key.time).SkipWhile(key => key.time > keyframe.time).Skip(1).FirstOrDefault();
+							var prevPoint = curveY.keys.OrderBy(key => key.time).TakeWhile(key => key.time > keyframe.time).LastOrDefault();
+							if (nextPoint.time == 0f)
+							{
+								keyframeY.outTangent = 0f;
+							}
+							else
+							{
+								var p1 = new Vector2(nextPoint.time, nextPoint.value);
+								var p2 = new Vector2(keyframeY.time, keyframeY.value);
+
+								var delta = p1 - p2;
+
+								keyframeY.outTangent = delta.y / delta.x;
+							}
+
+							if (prevPoint.time == 0f)
+							{
+								keyframeY.inTangent = 0f;
+							}
+							else
+							{
+								var p1 = new Vector2(prevPoint.time, prevPoint.value);
+								var p2 = new Vector2(keyframeY.time, keyframeY.value);
+
+								var delta = p2 - p1;
+
+								keyframeY.inTangent = delta.y / delta.x;
+							}
+
+							keyframeY.tangentMode = 10;
+						}
+
+						if (curveX.keys.Any(key => Math.Abs(key.time - keyframeX.time) < 0.001f))
+						{
+							var keyX = curveX.keys
+								.FirstOrDefault(key => Math.Abs(key.time - keyframeX.time) < 0.001f);
+							var index = Array.IndexOf(curveX.keys, keyX);
+							curveX.MoveKey(index, keyframeX);
+						}
+						else
+						{
+							curveX.AddKey(keyframeX);
+						}
+
+						if (curveY.keys.Any(key => Math.Abs(key.time - keyframeY.time) < 0.001f))
+						{
+							var keyY = curveY.keys
+								.FirstOrDefault(key => Math.Abs(key.time - keyframeY.time) < 0.001f);
+							var index = Array.IndexOf(curveY.keys, keyY);
+							curveY.MoveKey(index, keyframeY);
+						}
+						else
+						{
+							curveY.AddKey(keyframeY);
+						}
+
+						if (curveZ.keys.Any(key => Math.Abs(key.time - keyframeZ.time) < 0.001f))
+						{
+							var keyZ = curveZ.keys
+								.FirstOrDefault(key => Math.Abs(key.time - keyframeZ.time) < 0.001f);
+							var index = Array.IndexOf(curveZ.keys, keyZ);
+							curveZ.MoveKey(index, keyframeZ);
+						}
+						else
+						{
+							curveZ.AddKey(keyframeZ);
+						}
+
 						AnimationUtility.SetEditorCurve(animEvent.Clip, curveBindingX, curveX);
-
-						curveY.keys = keyPointsY.ToArray();
 						AnimationUtility.SetEditorCurve(animEvent.Clip, curveBindingY, curveY);
-
-						curveZ.keys = keyPointsZ.ToArray();
 						AnimationUtility.SetEditorCurve(animEvent.Clip, curveBindingZ, curveZ);
-
+						var settings = AnimationUtility.GetAnimationClipSettings(animEvent.Clip);
 						animEvent.Clip.EnsureQuaternionContinuity();
 
 						return;
 					}
-					else
-					{
-						keyPointsZ.Add(keyframe);
-					}
 				}
 			}
-		
+
 			var curveBindingRotX = curveBindings
 				.FirstOrDefault(curv => curv.propertyName.Equals("localEulerAnglesRaw.x", StringComparison.InvariantCultureIgnoreCase));
 			var curveBindingRotY = curveBindings

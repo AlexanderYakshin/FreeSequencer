@@ -9,6 +9,7 @@ namespace FreeSequencer.Events
 	[Serializable]
 	public class AnimationSeqEvent:BaseEvent
 	{
+		public AnimationState State;
 		public AnimationClip Clip;
 		public bool ControlAnimation;
 
