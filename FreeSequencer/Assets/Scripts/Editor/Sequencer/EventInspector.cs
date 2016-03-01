@@ -90,6 +90,10 @@ namespace FreeSequencer.Editor
 				_editorWindow.Repaint();
 			}
 			EditorGUILayout.BeginHorizontal();
+			EditorGUILayout.LabelField("Title", GUILayout.Width(150f));
+			seqEvent.EventTitle = EditorGUILayout.TextField(seqEvent.EventTitle);
+			EditorGUILayout.EndHorizontal();
+			EditorGUILayout.BeginHorizontal();
 			EditorGUILayout.LabelField("Color", GUILayout.Width(150f));
 			seqEvent.EventInnerColor = EditorGUILayout.ColorField(seqEvent.EventInnerColor);
 			EditorGUILayout.EndHorizontal();

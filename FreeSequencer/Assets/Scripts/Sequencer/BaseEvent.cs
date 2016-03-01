@@ -4,11 +4,13 @@ using UnityEngine;
 namespace FreeSequencer.Events
 {
 	[Serializable]
-	public class BaseEvent:ScriptableObject
+	public class BaseEvent : ScriptableObject
 	{
 		public string EventTitle;
 		public int StartFrame;
 		public int EndFrame;
+
+		public int Length { get { return EndFrame - StartFrame; } }
 
 		public Color EventInnerColor;
 		public Color EventTitleColor;

@@ -56,11 +56,12 @@ namespace FreeSequencer.Editor
 		private float _gridWidth;
 		private float _gridHeight;
 
-
 		#region TimeControl
 
 		private bool _isPlaying;
+		private bool _prevIsPlaing;
 		private float _playTime;
+		private float _speed;
 
 		#endregion
 
@@ -89,12 +90,13 @@ namespace FreeSequencer.Editor
 		void OnGUI()
 		{
 			x_endGrid = position.width - 10f;
-			y_endGrid = position.height - 35f;
+			y_endGrid = position.height - 60f;
 
 			DrawSequenceRegion();
 			DropAreaGUI();
 			DrawGrid();
 			GUILayout.FlexibleSpace();
+			DrawFrameSlider();
 			DrawTimeControls();
 		}
 
@@ -243,7 +245,7 @@ namespace FreeSequencer.Editor
 			_gridHeight = y_endGrid - y_startGrid;
 			var length = _maxCurrentFrame - _minCurrentFrame;
 			x_dif = _gridWidth / length;
-			koef = x_dif < 4f ? 10 : 1;
+			koef = x_dif < 8f ? (int)(4f / x_dif * 4f) : (int)Mathf.Clamp(4f / x_dif * 2f, 1, 100);
 			var framesCount = length / koef;
 
 			Handles.color = Color.white;
@@ -275,8 +277,8 @@ namespace FreeSequencer.Editor
 
 				if (evenFrame && i != framesCount)
 				{
-					var rate = i * koef / _selectedSequence.FrameRate;
-					var time = string.Format("{0}:{1}", Mathf.Ceil(rate), (i * koef) % _selectedSequence.FrameRate);
+					var rate = (_minCurrentFrame + (i * koef)) / _selectedSequence.FrameRate;
+					var time = string.Format("{0}:{1}", Mathf.Ceil(rate), (_minCurrentFrame + (i * koef)) % _selectedSequence.FrameRate);
 					Handles.Label(new Vector3(x_startGrid + i * x_dif * koef + 1f, y_endGrid + 3f), time);
 				}
 
@@ -284,7 +286,7 @@ namespace FreeSequencer.Editor
 				i++;
 			}
 
-			if (!_isPlaying && GetMouseOverRect(new Rect(x_startGrid, y_startGrid, _gridWidth, _gridHeight + 15f)))
+			if (!_isPlaying && GetMouseOverRect(new Rect(x_startGrid, y_endGrid, _gridWidth, 15f)))
 			{
 				Vector2 mousePosition = Event.current.mousePosition;
 				var frame = (mousePosition.x - x_startGrid) / x_dif;
@@ -360,14 +362,17 @@ namespace FreeSequencer.Editor
 			var cacheColor = Handles.color;
 			Handles.color = Color.black;
 			Handles.DrawSolidRectangleWithOutline(rect, color, color);
+			var innerRect = new Rect(rect.x + 2f, rect.y + 2f, rect.width - 4f, rect.height - 4f);
 			Handles.color = color;
-			Handles.DrawSolidRectangleWithOutline(new Rect(rect.x + 2f, rect.y + 2f, rect.width - 4f, rect.height - 4f), color, color);
+			Handles.DrawSolidRectangleWithOutline(innerRect, color, color);
 
 			if (_selectedEvent == baseEvent)
 			{
 				Handles.color = new Color(selectionColor.r, selectionColor.g, selectionColor.b, 0.3f);
 				Handles.DrawSolidRectangleWithOutline(rect, selectionColor, selectionColor);
 			}
+			Handles.color = Color.white;
+			Handles.Label(new Vector3(innerRect.x, innerRect.y, 0), baseEvent.EventTitle);
 
 			Handles.color = cacheColor;
 
@@ -421,7 +426,7 @@ namespace FreeSequencer.Editor
 					};
 					if (index > 0)
 						toolsMenu.AddItem(new GUIContent("Move left"), false, OnMove, moveLeftHolder);
-					if (index < baseTrack.Events.Count)
+					if (index < baseTrack.Events.Count - 1)
 						toolsMenu.AddItem(new GUIContent("Move right"), false, OnMove, moveRightHolder);
 				}
 
@@ -429,44 +434,89 @@ namespace FreeSequencer.Editor
 			}
 		}
 
-		private void OnMove(object data)
+		private void DrawFrameSlider()
 		{
-			var holder = data as MoveHolder;
-			if (holder == null)
-				return;
+			EditorGUILayout.BeginHorizontal(GUILayout.Height(25f));
+			EditorGUILayout.BeginHorizontal(GUILayout.Width(3f));
+			EditorGUILayout.Space();
+			EditorGUILayout.EndHorizontal();
+			float start = _minCurrentFrame;
+			float end = _maxCurrentFrame;
 
-			if (holder.MoveRight)
-			{
-				var nextEvent = holder.Track.Events.OrderBy(evt => evt.StartFrame)
-					.Where(evt => evt.StartFrame > holder.Event.StartFrame).FirstOrDefault();
-
-			}
+			EditorGUILayout.MinMaxSlider(ref start, ref end, 0, _selectedSequence != null ? _selectedSequence.Length : 1);
+			_minCurrentFrame = (int)start;
+			_maxCurrentFrame = (int)end;
+			EditorGUILayout.BeginHorizontal(GUILayout.Width(3f));
+			EditorGUILayout.Space();
+			EditorGUILayout.EndHorizontal();
+			EditorGUILayout.EndHorizontal();
 		}
+
+		private void DrawTimeControls()
+		{
+			EditorGUILayout.BeginHorizontal(GUILayout.Height(15f));
+			EditorGUILayout.BeginHorizontal(GUILayout.Width(3f));
+			EditorGUILayout.Space();
+			EditorGUILayout.EndHorizontal();
+			if (GUILayout.Button("<<", EditorStyles.toolbarButton, GUILayout.Width(30f)))
+			{
+				if (CurrentFrameNumber > _minCurrentFrame)
+					CurrentFrameNumber = _minCurrentFrame;
+			}
+			if (GUILayout.Button("<", EditorStyles.toolbarButton, GUILayout.Width(30f)))
+			{
+				if (CurrentFrameNumber > _minCurrentFrame)
+					CurrentFrameNumber--;
+			}
+
+			CurrentFrameNumber = EditorGUILayout.IntField(_currentFrameNumber, GUILayout.Width(40f));
+
+			if (GUILayout.Button(">", EditorStyles.toolbarButton, GUILayout.Width(30f)))
+			{
+				if (CurrentFrameNumber < _maxCurrentFrame)
+					CurrentFrameNumber++;
+			}
+			if (GUILayout.Button(">>", EditorStyles.toolbarButton, GUILayout.Width(30f)))
+			{
+				if (CurrentFrameNumber < _maxCurrentFrame)
+					CurrentFrameNumber = _maxCurrentFrame;
+			}
+
+			EditorGUILayout.BeginHorizontal(GUILayout.Width(3f));
+			EditorGUILayout.Space();
+			EditorGUILayout.EndHorizontal();
+
+			_isPlaying = GUILayout.Toggle(_isPlaying, !_isPlaying ? "Play" : "Pause", EditorStyles.toolbarButton, GUILayout.Width(40f));
+
+			GUILayout.FlexibleSpace();
+
+			EditorGUILayout.LabelField("Speed", GUILayout.Width(50f));
+			_speed = EditorGUILayout.Slider(_speed, 0.1f, 3f, GUILayout.Width(120f));
+
+			GUILayout.FlexibleSpace();
+
+			EditorGUILayout.BeginHorizontal();
+			EditorGUILayout.LabelField("View Range", GUILayout.Width(70f));
+			var min = EditorGUILayout.IntField(_minCurrentFrame, GUILayout.Width(50f));
+			_minCurrentFrame = Mathf.Clamp(min, 0, _maxCurrentFrame - 1);
+			EditorGUILayout.LabelField("-", GUILayout.Width(10f));
+			var max = EditorGUILayout.IntField(_maxCurrentFrame, GUILayout.Width(50f));
+			_maxCurrentFrame = Mathf.Clamp(max, _minCurrentFrame + 1, _selectedSequence != null ? _selectedSequence.Length : 1);
+			EditorGUILayout.EndHorizontal();
+			EditorGUILayout.BeginHorizontal(GUILayout.Width(3f));
+			EditorGUILayout.Space();
+			EditorGUILayout.EndHorizontal();
+
+			EditorGUILayout.EndHorizontal();
+			EditorGUILayout.BeginHorizontal(GUILayout.Height(4f));
+			EditorGUILayout.Space();
+			EditorGUILayout.EndHorizontal();
+
+			HandlePlayingAnimation();
+		}
+
 
 		#endregion
-
-		private void LoadSequences()
-		{
-			if (_sequences == null)
-				_sequences = new Dictionary<string, Sequence>();
-			var sequences = FindObjectsOfType<Sequence>();
-			foreach (Sequence sequance in sequences)
-			{
-				if (!_sequences.ContainsKey(sequance.name))
-				{
-					_sequences.Add(sequance.name, sequance);
-				}
-				else
-				{
-					_sequences[sequance.name] = sequance;
-				}
-			}
-			var copy = _sequences.ToDictionary(seq => seq.Key, seq => seq.Value);
-			foreach (var seq in copy.Where(kv => kv.Value == null))
-			{
-				_sequences.Remove(seq.Key);
-			}
-		}
 
 		#region Handle Events
 
@@ -526,6 +576,48 @@ namespace FreeSequencer.Editor
 
 		#endregion
 
+		#region Context Menu Methods
+
+		private void OnMove(object data)
+		{
+			var holder = data as MoveHolder;
+			if (holder == null)
+				return;
+
+			if (holder.MoveRight)
+			{
+				var nextEvent = holder.Track.Events
+					.OrderBy(evt => evt.StartFrame).FirstOrDefault(evt => evt.StartFrame > holder.Event.StartFrame);
+
+				var gap = nextEvent.StartFrame - holder.Event.EndFrame;
+				var lengthNextEvt = nextEvent.Length;
+				var holderEvtLength = holder.Event.Length;
+
+				nextEvent.StartFrame = holder.Event.StartFrame;
+				nextEvent.EndFrame = holder.Event.StartFrame + lengthNextEvt;
+
+				holder.Event.StartFrame = nextEvent.EndFrame + gap;
+				holder.Event.EndFrame = holder.Event.StartFrame + holderEvtLength;
+			}
+			else
+			{
+				var nextEvent = holder.Track.Events
+					.OrderBy(evt => evt.StartFrame).LastOrDefault(evt => evt.StartFrame < holder.Event.StartFrame);
+
+				var gap = holder.Event.StartFrame - nextEvent.EndFrame;
+				var lengthNextEvt = nextEvent.Length;
+				var holderEvtLength = holder.Event.Length;
+
+				holder.Event.StartFrame = nextEvent.StartFrame;
+				holder.Event.EndFrame = nextEvent.StartFrame + holderEvtLength;
+
+				nextEvent.StartFrame = holder.Event.EndFrame + gap;
+				nextEvent.EndFrame = nextEvent.StartFrame + lengthNextEvt;
+			}
+
+			Repaint();
+		}
+
 		private void OnRemoveTrack(object userdata)
 		{
 			var holder = userdata as RemoveTrackHolder;
@@ -564,64 +656,6 @@ namespace FreeSequencer.Editor
 			Repaint();
 		}
 
-		private void DrawTimeControls()
-		{
-			EditorGUILayout.BeginHorizontal();
-			var prevIsPlaing = _isPlaying;
-			_isPlaying = GUILayout.Toggle(_isPlaying, !_isPlaying ? ">" : "||", EditorStyles.toolbarButton, GUILayout.Width(30f));
-			if (prevIsPlaing != _isPlaying)
-			{
-				if (_isPlaying)
-				{
-					_playTime = Time.realtimeSinceStartup;
-				}
-			}
-			if (_isPlaying)
-			{
-				var dif = Time.realtimeSinceStartup - _playTime;
-				var tick = (float)_selectedSequence.FrameRate / 3600f;
-				if (dif > tick)
-				{
-					_playTime += tick;
-					OnPlayTick();
-				}
-				Repaint();
-			}
-
-			if (GUILayout.Button("|>", GUILayout.Width(30f)))
-			{
-				if (CurrentFrameNumber < _maxCurrentFrame)
-					CurrentFrameNumber++;
-			}
-
-			EditorGUILayout.LabelField(CurrentFrameNumber.ToString(), GUILayout.Width(50f));
-
-			if (_selectedSequence != null)
-			{
-				float start = _minCurrentFrame;
-				float end = _maxCurrentFrame;
-
-				EditorGUILayout.MinMaxSlider(ref start, ref end, 0, _selectedSequence.Length);
-				_minCurrentFrame = (int)start;
-				_maxCurrentFrame = (int)end;
-			}
-
-
-			EditorGUILayout.EndHorizontal();
-		}
-
-		private void OnPlayTick()
-		{
-			if (CurrentFrameNumber < _maxCurrentFrame)
-			{
-				CurrentFrameNumber++;
-			}
-			else
-			{
-				_isPlaying = false;
-			}
-		}
-
 		private void OnAddAnimationTrack(object userdata)
 		{
 			var animatedObject = (AnimatedGameObject)userdata;
@@ -648,6 +682,66 @@ namespace FreeSequencer.Editor
 			var animEvent = new AnimationSeqEvent() { StartFrame = holder.StartFrame, EndFrame = holder.EndFrame };
 			animationTrack.Events.Add(animEvent);
 			animatedObject.Toggled = true;
+		}
+
+		#endregion
+
+		private void LoadSequences()
+		{
+			if (_sequences == null)
+				_sequences = new Dictionary<string, Sequence>();
+			var sequences = FindObjectsOfType<Sequence>();
+			foreach (Sequence sequance in sequences)
+			{
+				if (!_sequences.ContainsKey(sequance.name))
+				{
+					_sequences.Add(sequance.name, sequance);
+				}
+				else
+				{
+					_sequences[sequance.name] = sequance;
+				}
+			}
+			var copy = _sequences.ToDictionary(seq => seq.Key, seq => seq.Value);
+			foreach (var seq in copy.Where(kv => kv.Value == null))
+			{
+				_sequences.Remove(seq.Key);
+			}
+		}
+
+		private void HandlePlayingAnimation()
+		{
+			if (_prevIsPlaing != _isPlaying)
+			{
+				if (_isPlaying)
+				{
+					_playTime = Time.realtimeSinceStartup;
+				}
+			}
+			if (_isPlaying)
+			{
+				var dif = Time.realtimeSinceStartup - _playTime;
+				var tick = (float)_selectedSequence.FrameRate / 3600f / _speed;
+				if (dif > tick)
+				{
+					_playTime += tick;
+					OnPlayTick();
+				}
+				Repaint();
+			}
+			_prevIsPlaing = _isPlaying;
+		}
+
+		private void OnPlayTick()
+		{
+			if (CurrentFrameNumber < _maxCurrentFrame)
+			{
+				CurrentFrameNumber++;
+			}
+			else
+			{
+				_isPlaying = false;
+			}
 		}
 
 		private static bool GetMouseDownRect(Rect rect, int button = 0)
