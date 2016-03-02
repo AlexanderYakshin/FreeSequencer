@@ -950,7 +950,8 @@ namespace FreeSequencer.Editor
 									var animEvent = baseEvent as AnimationTrackEvent;
 									if (animEvent != null && animEvent.Clip != null)
 									{
-										DrawTransformPath(animEvent, track.ShowRotationNormales, track.PathColor);
+										var path = track.ObjectsPathToShowTransform;
+										DrawTransformPath(animEvent, track.ShowRotationNormales, track.PathColor, path);
 										if (track.ShowKeyFrames)
 											DrawKeyFrames(animEvent);
 									}
@@ -1419,23 +1420,16 @@ namespace FreeSequencer.Editor
 					}
 				}
 			}
-
-			var curveBindingRotX = curveBindings
-				.FirstOrDefault(curv => curv.propertyName.Equals("localEulerAnglesRaw.x", StringComparison.InvariantCultureIgnoreCase));
-			var curveBindingRotY = curveBindings
-				.FirstOrDefault(curv => curv.propertyName.Equals("localEulerAnglesRaw.y", StringComparison.InvariantCultureIgnoreCase));
-			var curveBindingRotZ = curveBindings
-				.FirstOrDefault(curv => curv.propertyName.Equals("localEulerAnglesRaw.z", StringComparison.InvariantCultureIgnoreCase));
 		}
 
-		private void DrawTransformPath(AnimationTrackEvent trackEvent, bool showPositionNormales, Color pathColor)
+		private void DrawTransformPath(AnimationTrackEvent trackEvent, bool showPositionNormales, Color pathColor, string path)
 		{
-			DrawPositionTransformPath(trackEvent, showPositionNormales, pathColor);
+			DrawPositionTransformPath(trackEvent, showPositionNormales, pathColor, path);
 		}
 
-		private void DrawPositionTransformPath(AnimationTrackEvent trackEvent, bool showPositionNormales, Color pathColor)
+		private void DrawPositionTransformPath(AnimationTrackEvent trackEvent, bool showPositionNormales, Color pathColor, string path)
 		{
-			var curveBindings = AnimationUtility.GetCurveBindings(trackEvent.Clip);
+			var curveBindings = AnimationUtility.GetCurveBindings(trackEvent.Clip).Where(curve => curve.path.Equals(path));
 			var curveBindingRotX = curveBindings
 				.FirstOrDefault(curv => curv.propertyName.Equals("localEulerAnglesRaw.x", StringComparison.InvariantCultureIgnoreCase));
 			var curveBindingRotY = curveBindings

@@ -26,6 +26,8 @@ namespace FreeSequencer.Tracks
 		public bool ShowKeyFramesTimes;
 		public Color PathColor = Color.white;
 
+		public string ObjectsPathToShowTransform;
+
 		public List<TrackEvent> Events;
 
 		public BaseTrack()

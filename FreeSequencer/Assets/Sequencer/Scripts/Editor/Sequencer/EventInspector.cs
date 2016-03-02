@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FreeSequencer.Events;
 using FreeSequencer.Tracks;
@@ -25,6 +26,7 @@ namespace FreeSequencer.Editor
 		private int _minFrame;
 		private int _maxFrame;
 		private int _layerIndex;
+		private int _objectIndex;
 
 		public void Init(string seqName, int frameRate, int length, int minFrame, int maxFrame, GameObject gameObject = null, BaseTrack track = null, TrackEvent seqEvent = null)
 		{
@@ -78,13 +80,13 @@ namespace FreeSequencer.Editor
 			float _min = trackEvent.StartFrame;
 			float _max = trackEvent.EndFrame;
 			EditorGUILayout.MinMaxSlider(ref _min, ref _max, 0, _length);
-			if (!((int)_min < _minFrame && (int)_max != trackEvent.EndFrame 
+			if (!((int)_min < _minFrame && (int)_max != trackEvent.EndFrame
 				|| (int)_max > _maxFrame && (int)_max != trackEvent.StartFrame))
 			{
 				trackEvent.StartFrame = Mathf.Clamp((int)_min, _minFrame, trackEvent.EndFrame - 1);
 				trackEvent.EndFrame = Mathf.Clamp((int)_max, trackEvent.StartFrame + 1, _maxFrame);
 			}
-				
+
 			EditorGUILayout.EndHorizontal();
 			if (EditorGUI.EndChangeCheck())
 			{
@@ -166,12 +168,12 @@ namespace FreeSequencer.Editor
 			EditorGUILayout.BeginVertical();
 			EditorGUILayout.LabelField("Track Tools:", GUILayout.Width(150f));
 
-			EditorGUILayout.BeginHorizontal();
+			/*EditorGUILayout.BeginHorizontal();
 
 			EditorGUILayout.LabelField("Sync Animation Window", GUILayout.Width(150f));
 			_currentTrack.SyncAnimationWindow = EditorGUILayout.Toggle(_currentTrack.SyncAnimationWindow);
 
-			EditorGUILayout.EndHorizontal();
+			EditorGUILayout.EndHorizontal();*/
 
 			EditorGUILayout.BeginHorizontal();
 
@@ -179,7 +181,23 @@ namespace FreeSequencer.Editor
 			_currentTrack.ShowTransformPath = EditorGUILayout.Toggle(_currentTrack.ShowTransformPath);
 
 			EditorGUILayout.EndHorizontal();
+			var names = GetObjectPaths(_selectedGameObject);
+			if (names.Count > 1)
+			{
+				EditorGUILayout.BeginHorizontal();
+				EditorGUILayout.LabelField("Path To Object", GUILayout.Width(150f));
+				if (_objectIndex > names.Count - 1)
+					_objectIndex = 0;
+				_objectIndex = EditorGUILayout.Popup(_objectIndex, names.ToArray());
 
+				_currentTrack.ObjectsPathToShowTransform = names[_objectIndex] == " " ? "" : names[_objectIndex]; ;
+
+				EditorGUILayout.EndHorizontal();
+			}
+			else
+			{
+				_currentTrack.ObjectsPathToShowTransform = string.Empty;
+			}
 			EditorGUILayout.BeginHorizontal();
 
 			EditorGUILayout.LabelField("Show Rotation Normales", GUILayout.Width(150f));
@@ -205,6 +223,36 @@ namespace FreeSequencer.Editor
 			}
 
 			EditorGUILayout.EndVertical();
+		}
+
+		private List<string> GetObjectPaths(GameObject selectedGameObject, string prevPath = null)
+		{
+			var result = new List<string>();
+
+			var path = prevPath + "\\" + selectedGameObject.name;
+			if (prevPath == null)
+			{
+				result.Add(" ");
+				path = "";
+			}
+			else if (prevPath == string.Empty)
+			{
+				path = selectedGameObject.name;
+				result.Add(path);
+			}
+			else
+			{
+				path = prevPath + "\\" + selectedGameObject.name;
+				result.Add(path);
+			}
+
+			for (int i = 0; i < selectedGameObject.transform.childCount; i++)
+			{
+				var child = selectedGameObject.transform.GetChild(i);
+				result.AddRange(GetObjectPaths(child.gameObject, path));
+			}
+
+			return result;
 		}
 
 		private void DrawTrackSection()
