@@ -317,6 +317,7 @@ namespace FreeSequencer.Editor
 				var mousePos = Event.current.mousePosition;
 				GenericMenu toolsMenu = new GenericMenu();
 				toolsMenu.AddItem(new GUIContent("Remove Track"), false, OnRemoveTrack, new RemoveTrackHolder() { Track = track, AnimatedGameObject = animatedGameObject });
+				toolsMenu.AddItem(new GUIContent("Generate State Machine"), false, OnTrackChanged, track);
 				// Offset menu from right of editor window
 				toolsMenu.DropDown(new Rect(mousePos.x, mousePos.y, 0, 0));
 				GUIUtility.ExitGUI();
@@ -765,6 +766,132 @@ namespace FreeSequencer.Editor
 			}
 
 			return false;
+		}
+
+		private void OnTrackChanged(object data)
+		{
+			var track = data as BaseTrack;
+			var animationTrack = track as AnimationTrack;
+
+			if (animationTrack != null)
+				OnAnimationTrackChanged(animationTrack);
+		}
+
+		private void OnAnimationTrackChanged(AnimationTrack animationTrack)
+		{
+			if (animationTrack.Controller == null)
+				return;
+			var controller = animationTrack.Controller as UnityEditor.Animations.AnimatorController;
+			UnityEditor.Animations.AnimatorControllerLayer layer;
+			if (string.IsNullOrEmpty(animationTrack.ControllerLayer))
+				layer = controller.layers[0];
+			else
+				layer = controller.layers.FirstOrDefault(lyr => lyr.name.Equals(animationTrack.ControllerLayer));
+
+			if (layer == null)
+				return;
+
+			var rootStateMAchine = layer.stateMachine;
+			var seqStateMachine = rootStateMAchine.stateMachines.Select(sm => sm.stateMachine)
+				.FirstOrDefault(sm => sm.name.Equals(_selectedSequenceName));
+			if (seqStateMachine != null)
+				rootStateMAchine.RemoveStateMachine(seqStateMachine);
+
+			seqStateMachine = rootStateMAchine.AddStateMachine(_selectedSequenceName);
+
+			var events = animationTrack.Events.OrderBy(evt => evt.StartFrame).ToList();
+			var lastEndFrame = 0;
+			UnityEditor.Animations.AnimatorState prevState = null;
+			for (int i = 0; i < events.Count; i++)
+			{
+				var evt = events[i] as AnimationSeqEvent;
+
+				if (evt.StartFrame > lastEndFrame)
+				{
+					var prevEvtState = seqStateMachine.states.Select(st => st.state)
+						.FirstOrDefault(st => st.name.Equals(evt.EventTitle + "_Prev"));
+					if (prevEvtState == null)
+					{
+						prevEvtState = seqStateMachine.AddState(evt.EventTitle + "_Prev");
+					}
+
+					if (i!=0)
+					{
+						var tran1 = prevState.AddTransition(prevEvtState);
+						tran1.duration = 0f;
+						tran1.exitTime = 1f;
+						tran1.hasExitTime = true;
+					}
+
+					prevState = prevEvtState;
+				}
+
+				var evtState = seqStateMachine.states.Select(st => st.state)
+						.FirstOrDefault(st => st.name.Equals(evt.EventTitle));
+				if (evtState == null)
+				{
+					evtState = seqStateMachine.AddState(evt.EventTitle);
+				}
+				evtState.motion = evt.Clip;
+
+				if (i==0)
+				{
+					var firstState = prevState == null ? evtState : prevState;
+					var firstTrans = seqStateMachine.AddEntryTransition(firstState);
+				}
+				else
+				{
+					var tran = prevState.AddTransition(evtState);
+					tran.duration = 0f;
+					tran.exitTime = (float)(evt.StartFrame - lastEndFrame) / _selectedSequence.FrameRate;
+					tran.hasExitTime = true;
+				}
+
+
+				lastEndFrame = evt.EndFrame;
+				prevState = evtState;
+
+				if (i == events.Count - 1)
+				{
+					if (lastEndFrame < _selectedSequence.Length)
+					{
+						var nexEvtState = seqStateMachine.states.Select(st => st.state)
+						.FirstOrDefault(st => st.name.Equals(evt.EventTitle + "_Last"));
+						if (nexEvtState == null)
+						{
+							nexEvtState = seqStateMachine.AddState(evt.EventTitle + "_Last");
+						}
+
+						var tran2 = prevState.AddTransition(nexEvtState);
+						tran2.duration = 0f;
+						tran2.exitTime = 1;
+						tran2.hasExitTime = true;
+
+						var tran3 = nexEvtState.AddExitTransition();
+						tran3.duration = 0f;
+						tran3.exitTime = (float)(_selectedSequence.Length - lastEndFrame) / _selectedSequence.FrameRate;
+						tran3.hasExitTime = true;
+					}
+					else
+					{
+						var tran3 = prevState.AddExitTransition();
+						tran3.duration = 0f;
+						tran3.exitTime = 1;
+						tran3.hasExitTime = true;
+					}
+				}
+			}
+
+			string paramName = _selectedSequenceName + layer.name;
+			var param = controller.parameters.FirstOrDefault(par =>
+				par.type == UnityEngine.AnimatorControllerParameterType.Trigger
+					&& par.name.Equals(paramName));
+
+			if (param == null)
+				controller.AddParameter(paramName, UnityEngine.AnimatorControllerParameterType.Trigger);
+
+			var transition = rootStateMAchine.AddAnyStateTransition(seqStateMachine);
+			transition.AddCondition(UnityEditor.Animations.AnimatorConditionMode.If, 0, paramName);
 		}
 
 

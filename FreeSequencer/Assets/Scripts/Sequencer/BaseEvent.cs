@@ -15,6 +15,7 @@ namespace FreeSequencer.Events
 		public Color EventInnerColor;
 		public Color EventTitleColor;
 
+		public bool IsDirty;
 		public BaseEvent()
 		{
 			EventInnerColor = Color.blue;
