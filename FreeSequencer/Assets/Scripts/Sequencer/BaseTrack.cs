@@ -21,14 +21,17 @@ namespace FreeSequencer.Tracks
 
 		public bool SyncAnimationWindow;
 		public bool ShowTransformPath;
+		public bool ShowRotationNormales;
 		public bool ShowKeyFrames;
 		public bool ShowKeyFramesTimes;
+		public Color PathColor = Color.white;
 
-		public List<BaseEvent> Events;
+		public List<TrackEvent> Events;
 
 		public BaseTrack()
 		{
-			Events = new List<BaseEvent>();
+			Events = new List<TrackEvent>();
+			PathColor = Color.white;
 		}
 	}
 }

@@ -49,7 +49,7 @@ namespace FreeSequencer.Editor
 		private int _seqIndex;
 		private string _selectedSequenceName;
 		private Sequence _selectedSequence;
-		private BaseEvent _selectedEvent;
+		private TrackEvent _selectedEvent;
 		private BaseTrack _selectedTrack;
 
 		private Dictionary<string, Sequence> _sequences;
@@ -116,7 +116,7 @@ namespace FreeSequencer.Editor
 					new int[] { 10, 20, 30, 40, 50, 60 }, GUILayout.Width(40), GUILayout.Height(20f));
 				EditorGUILayout.LabelField("Length", GUILayout.Width(64), GUILayout.Height(20f));
 				var length = EditorGUILayout.IntField(_selectedSequence.Length, GUILayout.Width(64), GUILayout.Height(18f));
-				_selectedSequence.Length = Mathf.Clamp(length, 1, 2000);
+				_selectedSequence.Length = Mathf.Clamp(length, 1, 9999);
 			}
 
 			EditorGUILayout.EndHorizontal();
@@ -138,6 +138,8 @@ namespace FreeSequencer.Editor
 					_selectedSequence = _sequences[_selectedSequenceName];
 
 					_maxCurrentFrame = _selectedSequence.Length;
+					_speed = 1;
+					_isPlaying = false;
 				}
 			}
 			else
@@ -350,15 +352,15 @@ namespace FreeSequencer.Editor
 			EditorGUILayout.EndHorizontal();
 		}
 
-		private void DrawEvent(BaseEvent baseEvent, BaseTrack track, GameObject gameObject, float startHeight, int minFrame, int maxFrame)
+		private void DrawEvent(TrackEvent trackEvent, BaseTrack track, GameObject gameObject, float startHeight, int minFrame, int maxFrame)
 		{
-			var startFr = baseEvent.StartFrame < _minCurrentFrame ? _minCurrentFrame : baseEvent.StartFrame;
-			var endFr = baseEvent.EndFrame > _maxCurrentFrame ? _maxCurrentFrame : baseEvent.EndFrame;
+			var startFr = trackEvent.StartFrame < _minCurrentFrame ? _minCurrentFrame : trackEvent.StartFrame;
+			var endFr = trackEvent.EndFrame > _maxCurrentFrame ? _maxCurrentFrame : trackEvent.EndFrame;
 			var start = x_startGrid + x_dif * (startFr - _minCurrentFrame);
 			var width = x_dif * (endFr - startFr);
 			var rect = new Rect(start, startHeight, width, 20f);
 			var selectionColor = Color.white;
-			var color = baseEvent.EventInnerColor;
+			var color = trackEvent.EventInnerColor;
 
 			var cacheColor = Handles.color;
 			Handles.color = Color.black;
@@ -367,29 +369,29 @@ namespace FreeSequencer.Editor
 			Handles.color = color;
 			Handles.DrawSolidRectangleWithOutline(innerRect, color, color);
 
-			if (_selectedEvent == baseEvent)
+			if (_selectedEvent == trackEvent)
 			{
 				Handles.color = new Color(selectionColor.r, selectionColor.g, selectionColor.b, 0.3f);
 				Handles.DrawSolidRectangleWithOutline(rect, selectionColor, selectionColor);
 			}
 			Handles.color = Color.white;
-			Handles.Label(new Vector3(innerRect.x, innerRect.y, 0), baseEvent.EventTitle);
+			Handles.Label(new Vector3(innerRect.x, innerRect.y, 0), trackEvent.EventTitle);
 
 			Handles.color = cacheColor;
 
-			if (_selectedEvent != baseEvent && GetMouseDownRect(rect))
+			if (_selectedEvent != trackEvent && GetMouseDownRect(rect))
 			{
-				_selectedEvent = baseEvent;
+				_selectedEvent = trackEvent;
 				_selectedTrack = track;
 				if (_inspectorWindow == null)
 					_inspectorWindow = EditorWindow.GetWindow<EventInspector>();
 				_inspectorWindow.Init(_selectedSequenceName, _selectedSequence.FrameRate,
-					_selectedSequence.Length, minFrame, maxFrame, gameObject, track, baseEvent);
+					_selectedSequence.Length, minFrame, maxFrame, gameObject, track, trackEvent);
 				_inspectorWindow.Repaint();
 			}
 		}
 
-		private void DrawEventMouseRect(int start1, int end1, float startHeight, AnimatedGameObject animatedGameObject, BaseTrack baseTrack, BaseEvent seqEvent = null, int index = 0)
+		private void DrawEventMouseRect(int start1, int end1, float startHeight, AnimatedGameObject animatedGameObject, BaseTrack baseTrack, TrackEvent seqEvent = null, int index = 0)
 		{
 			var start = start1 - _minCurrentFrame;
 			var end = end1 - _minCurrentFrame;
@@ -533,7 +535,7 @@ namespace FreeSequencer.Editor
 						{
 							if (baseTrack.Events != null && baseTrack.Events.Any())
 							{
-								foreach (BaseEvent @event in baseTrack.Events)
+								foreach (TrackEvent @event in baseTrack.Events)
 								{
 									ProcessEvent(@event, animatedGameObject.GameObject);
 								}
@@ -544,19 +546,19 @@ namespace FreeSequencer.Editor
 			}
 		}
 
-		private void ProcessEvent(BaseEvent baseEvent, GameObject gameObject)
+		private void ProcessEvent(TrackEvent trackEvent, GameObject gameObject)
 		{
-			if (CurrentFrameNumber < baseEvent.StartFrame || CurrentFrameNumber > baseEvent.EndFrame)
+			if (CurrentFrameNumber < trackEvent.StartFrame || CurrentFrameNumber > trackEvent.EndFrame)
 				return;
 
-			var animEvent = baseEvent as AnimationSeqEvent;
+			var animEvent = trackEvent as AnimationTrackEvent;
 			if (animEvent != null)
 			{
 				ProcessAnimationEvent(animEvent, gameObject);
 			}
 		}
 
-		private void ProcessAnimationEvent(AnimationSeqEvent animEvent, GameObject gameObject)
+		private void ProcessAnimationEvent(AnimationTrackEvent animEvent, GameObject gameObject)
 		{
 			if (animEvent.Clip != null)
 			{
@@ -665,8 +667,8 @@ namespace FreeSequencer.Editor
 
 			var animationTrack = new AnimationTrack() { TrackName = "Play Animation" };
 			if (animationTrack.Events == null)
-				animationTrack.Events = new List<BaseEvent>();
-			var animEvent = new AnimationSeqEvent() { StartFrame = 0, EndFrame = _selectedSequence.Length };
+				animationTrack.Events = new List<TrackEvent>();
+			var animEvent = new AnimationTrackEvent() { StartFrame = 0, EndFrame = _selectedSequence.Length , EventTitle = _selectedTrack.TrackName + (animationTrack.Events.Count + 1) };
 			animationTrack.Events.Add(animEvent);
 			animatedObject.Tracks.Add(animationTrack);
 			animatedObject.Toggled = true;
@@ -677,10 +679,10 @@ namespace FreeSequencer.Editor
 			var holder = (AddEventHolder)userdata;
 			var animatedObject = holder.AnimatedGameObject;
 
-			var animationTrack = holder.Track;
+			var animationTrack = holder.Track as AnimationTrack;
 			if (animationTrack.Events == null)
-				animationTrack.Events = new List<BaseEvent>();
-			var animEvent = new AnimationSeqEvent() { StartFrame = holder.StartFrame, EndFrame = holder.EndFrame };
+				animationTrack.Events = new List<TrackEvent>();
+			var animEvent = new AnimationTrackEvent() { StartFrame = holder.StartFrame, EndFrame = holder.EndFrame, EventTitle = _selectedTrack.TrackName + (animationTrack.Events.Count + 1)};
 			animationTrack.Events.Add(animEvent);
 			animatedObject.Toggled = true;
 		}
@@ -804,7 +806,7 @@ namespace FreeSequencer.Editor
 			UnityEditor.Animations.AnimatorState prevState = null;
 			for (int i = 0; i < events.Count; i++)
 			{
-				var evt = events[i] as AnimationSeqEvent;
+				var evt = events[i] as AnimationTrackEvent;
 
 				if (evt.StartFrame > lastEndFrame)
 				{
@@ -847,7 +849,6 @@ namespace FreeSequencer.Editor
 					tran.hasExitTime = true;
 				}
 
-
 				lastEndFrame = evt.EndFrame;
 				prevState = evtState;
 
@@ -882,7 +883,7 @@ namespace FreeSequencer.Editor
 				}
 			}
 
-			string paramName = _selectedSequenceName + layer.name;
+			string paramName = _selectedSequenceName;
 			var param = controller.parameters.FirstOrDefault(par =>
 				par.type == UnityEngine.AnimatorControllerParameterType.Trigger
 					&& par.name.Equals(paramName));
@@ -929,12 +930,12 @@ namespace FreeSequencer.Editor
 							var animTrack = track as AnimationTrack;
 							if (animTrack != null && animTrack.Controller != null && track.Events != null && track.Events.Any())
 							{
-								foreach (BaseEvent baseEvent in track.Events)
+								foreach (TrackEvent baseEvent in track.Events)
 								{
-									var animEvent = baseEvent as AnimationSeqEvent;
+									var animEvent = baseEvent as AnimationTrackEvent;
 									if (animEvent != null && animEvent.Clip != null)
 									{
-										DrawTransformPath(animEvent);
+										DrawTransformPath(animEvent, track.ShowRotationNormales, track.PathColor);
 										if (track.ShowKeyFrames)
 											DrawKeyFrames(animEvent);
 									}
@@ -947,7 +948,7 @@ namespace FreeSequencer.Editor
 			}
 		}
 
-		private void DrawKeyFrames(AnimationSeqEvent animEvent)
+		private void DrawKeyFrames(AnimationTrackEvent animEvent)
 		{
 			var curveBindings = AnimationUtility.GetCurveBindings(animEvent.Clip);
 			if (Tools.current == Tool.Move)
@@ -1412,14 +1413,14 @@ namespace FreeSequencer.Editor
 				.FirstOrDefault(curv => curv.propertyName.Equals("localEulerAnglesRaw.z", StringComparison.InvariantCultureIgnoreCase));
 		}
 
-		private void DrawTransformPath(AnimationSeqEvent seqEvent)
+		private void DrawTransformPath(AnimationTrackEvent trackEvent, bool showPositionNormales, Color pathColor)
 		{
-			DrawPositionTransformPath(seqEvent);
+			DrawPositionTransformPath(trackEvent, showPositionNormales, pathColor);
 		}
 
-		private void DrawPositionTransformPath(AnimationSeqEvent seqEvent)
+		private void DrawPositionTransformPath(AnimationTrackEvent trackEvent, bool showPositionNormales, Color pathColor)
 		{
-			var curveBindings = AnimationUtility.GetCurveBindings(seqEvent.Clip);
+			var curveBindings = AnimationUtility.GetCurveBindings(trackEvent.Clip);
 			var curveBindingRotX = curveBindings
 				.FirstOrDefault(curv => curv.propertyName.Equals("localEulerAnglesRaw.x", StringComparison.InvariantCultureIgnoreCase));
 			var curveBindingRotY = curveBindings
@@ -1436,16 +1437,16 @@ namespace FreeSequencer.Editor
 			if (curveBindingX.propertyName == null || curveBindingY.propertyName == null || curveBindingZ.propertyName == null)
 				return;
 
-			var curveX = AnimationUtility.GetEditorCurve(seqEvent.Clip, curveBindingX);
-			var curveY = AnimationUtility.GetEditorCurve(seqEvent.Clip, curveBindingY);
-			var curveZ = AnimationUtility.GetEditorCurve(seqEvent.Clip, curveBindingZ);
+			var curveX = AnimationUtility.GetEditorCurve(trackEvent.Clip, curveBindingX);
+			var curveY = AnimationUtility.GetEditorCurve(trackEvent.Clip, curveBindingY);
+			var curveZ = AnimationUtility.GetEditorCurve(trackEvent.Clip, curveBindingZ);
 
-			bool skipRotation = curveBindingRotX.propertyName == null || curveBindingRotY.propertyName == null ||
-				curveBindingRotZ.propertyName == null;
+			bool skipRotation = !showPositionNormales || (curveBindingRotX.propertyName == null || curveBindingRotY.propertyName == null ||
+				curveBindingRotZ.propertyName == null);
 
-			var curveRotX = skipRotation ? null : AnimationUtility.GetEditorCurve(seqEvent.Clip, curveBindingRotX);
-			var curveRotY = skipRotation ? null : AnimationUtility.GetEditorCurve(seqEvent.Clip, curveBindingRotY);
-			var curveRotZ = skipRotation ? null : AnimationUtility.GetEditorCurve(seqEvent.Clip, curveBindingRotZ);
+			var curveRotX = skipRotation ? null : AnimationUtility.GetEditorCurve(trackEvent.Clip, curveBindingRotX);
+			var curveRotY = skipRotation ? null : AnimationUtility.GetEditorCurve(trackEvent.Clip, curveBindingRotY);
+			var curveRotZ = skipRotation ? null : AnimationUtility.GetEditorCurve(trackEvent.Clip, curveBindingRotZ);
 
 			List<float> keyPoints = new List<float>();
 			foreach (Keyframe keyframe in curveX.keys)
@@ -1474,12 +1475,12 @@ namespace FreeSequencer.Editor
 
 			keyPoints.Sort();
 			var color = Handles.color;
-			for (int i = 0; i < keyPoints.Count - 1; i++)
+			for (int i = 0; i < keyPoints.Count-1; i++)
 			{
 				var length = keyPoints[i + 1] - keyPoints[i];
-				var countOfFrames = (int)(seqEvent.Clip.frameRate * length);
+				var countOfFrames = (int)(trackEvent.Clip.frameRate * length);
 				var oneframe = length / countOfFrames;
-				for (int j = 0; j < countOfFrames - 1; j++)
+				for (int j = 0; j < countOfFrames; j++)
 				{
 					var x = curveX.Evaluate(keyPoints[i] + oneframe * j);
 					var x1 = curveX.Evaluate(keyPoints[i] + oneframe * (j + 1));
@@ -1498,8 +1499,8 @@ namespace FreeSequencer.Editor
 						Handles.DrawLine(new Vector3(x, y, z), new Vector3(x, y, z) + Quaternion.Euler(xRot, yRot, zRot) * Vector3.forward * 0.5f);
 					}
 
-					Handles.color = Color.white;
-					Handles.DrawLine(
+					Handles.color = pathColor;
+					Handles.DrawAAPolyLine(3f,
 						new Vector3(x, y, z),
 						new Vector3(x1, y1, z1));
 				}
@@ -1507,12 +1508,12 @@ namespace FreeSequencer.Editor
 			Handles.color = color;
 		}
 
-		private void HandleLenghDifference(AnimationSeqEvent seqEvent, float dif)
+		private void HandleLenghDifference(AnimationTrackEvent trackEvent, float dif)
 		{
-			var curveBindings = AnimationUtility.GetCurveBindings(seqEvent.Clip);
+			var curveBindings = AnimationUtility.GetCurveBindings(trackEvent.Clip);
 			foreach (EditorCurveBinding editorCurveBinding in curveBindings)
 			{
-				var curve = AnimationUtility.GetEditorCurve(seqEvent.Clip, editorCurveBinding);
+				var curve = AnimationUtility.GetEditorCurve(trackEvent.Clip, editorCurveBinding);
 
 				var keyframes = new Keyframe[curve.length];
 				keyframes[0] = curve[0];
@@ -1525,8 +1526,8 @@ namespace FreeSequencer.Editor
 					keyframes[i] = keyframe;
 				}
 				curve.keys = keyframes;
-				AnimationUtility.SetEditorCurve(seqEvent.Clip, editorCurveBinding, curve);
-				seqEvent.Clip.EnsureQuaternionContinuity();
+				AnimationUtility.SetEditorCurve(trackEvent.Clip, editorCurveBinding, curve);
+				trackEvent.Clip.EnsureQuaternionContinuity();
 			}
 		}
 		#endregion

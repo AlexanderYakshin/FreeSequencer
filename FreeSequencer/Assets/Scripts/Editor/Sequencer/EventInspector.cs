@@ -19,19 +19,20 @@ namespace FreeSequencer.Editor
 		private float _max;
 
 		private GameObject _selectedGameObject;
-		private BaseEvent _currentSeqEvent;
+		private TrackEvent _currentTrackEvent;
 		private BaseTrack _currentTrack;
 		private SequencerEditorWindow _editorWindow;
 		private int _minFrame;
 		private int _maxFrame;
+		private int _layerIndex;
 
-		public void Init(string seqName, int frameRate, int length, int minFrame, int maxFrame, GameObject gameObject = null, BaseTrack track = null, BaseEvent seqEvent = null)
+		public void Init(string seqName, int frameRate, int length, int minFrame, int maxFrame, GameObject gameObject = null, BaseTrack track = null, TrackEvent seqEvent = null)
 		{
 			_seqName = seqName;
 			_frameRate = frameRate;
 			_length = length;
 			_selectedGameObject = gameObject;
-			_currentSeqEvent = seqEvent;
+			_currentTrackEvent = seqEvent;
 			_currentTrack = track;
 			_minFrame = minFrame;
 			_maxFrame = maxFrame;
@@ -42,10 +43,10 @@ namespace FreeSequencer.Editor
 		void OnGUI()
 		{
 			this.minSize = new Vector2(370f, 350f);
-			if (_selectedGameObject == null || _currentTrack == null || _currentSeqEvent == null)
+			if (_selectedGameObject == null || _currentTrack == null || _currentTrackEvent == null)
 				return;
 
-			var animationEvent = _currentSeqEvent as AnimationSeqEvent;
+			var animationEvent = _currentTrackEvent as AnimationTrackEvent;
 			if (animationEvent != null)
 			{
 				DrawAnimationEventInspector(animationEvent);
@@ -53,9 +54,9 @@ namespace FreeSequencer.Editor
 			}
 		}
 
-		private void DrawAnimationEventInspector(AnimationSeqEvent seqEvent)
+		private void DrawAnimationEventInspector(AnimationTrackEvent trackEvent)
 		{
-			if (seqEvent == null)
+			if (trackEvent == null)
 				return;
 
 			EditorGUILayout.BeginVertical();
@@ -64,24 +65,24 @@ namespace FreeSequencer.Editor
 			EditorGUILayout.LabelField("Range", GUILayout.Width(150f));
 			EditorGUI.BeginChangeCheck();
 			EditorGUILayout.LabelField("S:", GUILayout.Width(15f));
-			var start = EditorGUILayout.IntField(seqEvent.StartFrame);
-			seqEvent.StartFrame = Mathf.Clamp(start, _minFrame, seqEvent.EndFrame - 1);
+			var start = EditorGUILayout.IntField(trackEvent.StartFrame);
+			trackEvent.StartFrame = Mathf.Clamp(start, _minFrame, trackEvent.EndFrame - 1);
 			EditorGUILayout.LabelField("E:", GUILayout.Width(15f));
-			var end = EditorGUILayout.IntField(seqEvent.EndFrame);
-			seqEvent.EndFrame = Mathf.Clamp(end, seqEvent.StartFrame + 1, _length);
+			var end = EditorGUILayout.IntField(trackEvent.EndFrame);
+			trackEvent.EndFrame = Mathf.Clamp(end, trackEvent.StartFrame + 1, _length);
 
 			EditorGUILayout.EndHorizontal();
 
 			EditorGUILayout.BeginHorizontal();
 			EditorGUILayout.LabelField(string.Empty, GUILayout.Width(150f));
-			float _min = seqEvent.StartFrame;
-			float _max = seqEvent.EndFrame;
+			float _min = trackEvent.StartFrame;
+			float _max = trackEvent.EndFrame;
 			EditorGUILayout.MinMaxSlider(ref _min, ref _max, 0, _length);
-			if (!((int)_min < _minFrame && (int)_max != seqEvent.EndFrame 
-				|| (int)_max > _maxFrame && (int)_max != seqEvent.StartFrame))
+			if (!((int)_min < _minFrame && (int)_max != trackEvent.EndFrame 
+				|| (int)_max > _maxFrame && (int)_max != trackEvent.StartFrame))
 			{
-				seqEvent.StartFrame = Mathf.Clamp((int)_min, _minFrame, seqEvent.EndFrame - 1);
-				seqEvent.EndFrame = Mathf.Clamp((int)_max, seqEvent.StartFrame + 1, _maxFrame);
+				trackEvent.StartFrame = Mathf.Clamp((int)_min, _minFrame, trackEvent.EndFrame - 1);
+				trackEvent.EndFrame = Mathf.Clamp((int)_max, trackEvent.StartFrame + 1, _maxFrame);
 			}
 				
 			EditorGUILayout.EndHorizontal();
@@ -91,11 +92,16 @@ namespace FreeSequencer.Editor
 			}
 			EditorGUILayout.BeginHorizontal();
 			EditorGUILayout.LabelField("Title", GUILayout.Width(150f));
-			seqEvent.EventTitle = EditorGUILayout.TextField(seqEvent.EventTitle);
+			EditorGUI.BeginChangeCheck();
+			var title = EditorGUILayout.TextField(trackEvent.EventTitle);
+			if (EditorGUI.EndChangeCheck() && !string.IsNullOrEmpty(title))
+			{
+				trackEvent.EventTitle = title;
+			}
 			EditorGUILayout.EndHorizontal();
 			EditorGUILayout.BeginHorizontal();
 			EditorGUILayout.LabelField("Color", GUILayout.Width(150f));
-			seqEvent.EventInnerColor = EditorGUILayout.ColorField(seqEvent.EventInnerColor);
+			trackEvent.EventInnerColor = EditorGUILayout.ColorField(trackEvent.EventInnerColor);
 			EditorGUILayout.EndHorizontal();
 			EditorGUILayout.BeginHorizontal();
 			EditorGUILayout.LabelField("AnimationClip", GUILayout.Width(150f));
@@ -108,38 +114,46 @@ namespace FreeSequencer.Editor
 			}
 			else
 			{
-				seqEvent.Clip = (AnimationClip)EditorGUILayout.ObjectField(seqEvent.Clip, typeof(AnimationClip), true);
+				trackEvent.Clip = (AnimationClip)EditorGUILayout.ObjectField(trackEvent.Clip, typeof(AnimationClip), true);
 				EditorGUILayout.EndHorizontal();
 
-				if (seqEvent.Clip == null)
+				if (trackEvent.Clip == null)
 				{
 					if (GUILayout.Button("Create Clip"))
 					{
 						AnimationClip clip = new AnimationClip();
 						clip.frameRate = _frameRate;
 						var savePath = EditorUtility.SaveFilePanel("Create Clip", "Assets", string.Format("{0}_{1}", _selectedGameObject.name, _seqName),
-							"clip");
+							"anim");
+						if (!string.IsNullOrEmpty(savePath))
+						{
+							savePath = FileUtil.GetProjectRelativePath(savePath);
+							AssetDatabase.CreateAsset(clip, savePath);
+							AssetDatabase.SaveAssets();
 
-						AssetDatabase.CreateAsset(clip, savePath);
-						AssetDatabase.SaveAssets();
-
-						seqEvent.Clip = clip;
-						var controller = animationTrack.Controller as UnityEditor.Animations.AnimatorController;
-						var layer =
-							controller.layers.FirstOrDefault(
-								l => l.name.Equals(animationTrack.ControllerLayer, StringComparison.InvariantCultureIgnoreCase));
-						var rootStateMachine = layer.stateMachine;
-
-						var state = rootStateMachine.AddState(clip.name);
-						state.motion = clip;
+							trackEvent.Clip = clip;
+							/*var controller = animationTrack.Controller as UnityEditor.Animations.AnimatorController;
+							var layer =
+								controller.layers.FirstOrDefault(
+									l => l.name.Equals(animationTrack.ControllerLayer, StringComparison.InvariantCultureIgnoreCase));
+							var rootStateMachine = layer.stateMachine;
+							var state = rootStateMachine.AddState(clip.name);
+							state.motion = clip;*/
+						}
 					}
 				}
 				else
 				{
-					seqEvent.Clip.frameRate = _frameRate;
+					trackEvent.Clip.frameRate = _frameRate;
+					//AnimationMode.StartAnimationMode();
 				}
 			}
+			EditorGUILayout.BeginHorizontal();
 
+			EditorGUILayout.LabelField("Control Animation", GUILayout.Width(150f));
+			trackEvent.ControlAnimation = EditorGUILayout.Toggle(trackEvent.ControlAnimation);
+
+			EditorGUILayout.EndHorizontal();
 			DrawTrackSection();
 
 			DrawTrackToolSection();
@@ -168,10 +182,27 @@ namespace FreeSequencer.Editor
 
 			EditorGUILayout.BeginHorizontal();
 
+			EditorGUILayout.LabelField("Show Rotation Normales", GUILayout.Width(150f));
+			_currentTrack.ShowRotationNormales = EditorGUILayout.Toggle(_currentTrack.ShowRotationNormales);
+
+			EditorGUILayout.EndHorizontal();
+
+			EditorGUILayout.BeginHorizontal();
+
 			EditorGUILayout.LabelField("Show Key Frames", GUILayout.Width(150f));
 			_currentTrack.ShowKeyFrames = EditorGUILayout.Toggle(_currentTrack.ShowKeyFrames);
 
 			EditorGUILayout.EndHorizontal();
+
+			if (_currentTrack.ShowTransformPath)
+			{
+				EditorGUILayout.BeginHorizontal();
+
+				EditorGUILayout.LabelField("Path Color", GUILayout.Width(150f));
+				_currentTrack.PathColor = EditorGUILayout.ColorField(_currentTrack.PathColor);
+
+				EditorGUILayout.EndHorizontal();
+			}
 
 			EditorGUILayout.EndVertical();
 		}
@@ -223,6 +254,7 @@ namespace FreeSequencer.Editor
 				{
 					track.Controller = animator.runtimeAnimatorController;
 				}
+
 				if (track.Controller == null && animator.runtimeAnimatorController == null)
 				{
 					if (GUILayout.Button("Create Ctrl"))
@@ -231,13 +263,21 @@ namespace FreeSequencer.Editor
 						animator.runtimeAnimatorController = track.Controller;
 					}
 				}
+				if (track.Controller != null)
+				{
+					EditorGUILayout.BeginHorizontal();
 
-				EditorGUILayout.BeginHorizontal();
+					EditorGUILayout.LabelField("Animator Layer", GUILayout.Width(150f));
+					track.ControllerLayer = EditorGUILayout.TextField(track.ControllerLayer);
+					var controllerEditor = track.Controller as UnityEditor.Animations.AnimatorController;
+					var layers = controllerEditor.layers.Select(l => l.name).ToArray();
+					if (_layerIndex > layers.Length - 1)
+						_layerIndex = 0;
+					_layerIndex = EditorGUILayout.Popup(_layerIndex, layers, GUILayout.Width(200));
+					track.ControllerLayer = layers[_layerIndex];
+					EditorGUILayout.EndHorizontal();
+				}
 
-				EditorGUILayout.LabelField("Animator Layer", GUILayout.Width(150f));
-				track.ControllerLayer = EditorGUILayout.TextField(track.ControllerLayer);
-
-				EditorGUILayout.EndHorizontal();
 			}
 		}
 

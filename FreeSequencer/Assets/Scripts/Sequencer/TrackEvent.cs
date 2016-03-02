@@ -4,7 +4,7 @@ using UnityEngine;
 namespace FreeSequencer.Events
 {
 	[Serializable]
-	public class BaseEvent : ScriptableObject
+	public class TrackEvent : ScriptableObject
 	{
 		public string EventTitle;
 		public int StartFrame;
@@ -16,7 +16,7 @@ namespace FreeSequencer.Events
 		public Color EventTitleColor;
 
 		public bool IsDirty;
-		public BaseEvent()
+		public TrackEvent()
 		{
 			EventInnerColor = Color.blue;
 			EventTitleColor = Color.white;

@@ -8,6 +8,6 @@ namespace Assets.Scripts.Editor.Sequencer
 	{
 		public BaseTrack Track;
 		public AnimatedGameObject AnimatedGameObject;
-		public BaseEvent Event;
+		public TrackEvent Event;
 	}
 }

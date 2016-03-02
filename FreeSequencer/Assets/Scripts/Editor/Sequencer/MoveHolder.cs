@@ -5,7 +5,7 @@ namespace FreeSequencer.Editor
 {
 	public class MoveHolder
 	{
-		public BaseEvent Event;
+		public TrackEvent Event;
 		public BaseTrack Track;
 		public AnimatedGameObject AnimatedGameObject;
 		public bool MoveRight;
