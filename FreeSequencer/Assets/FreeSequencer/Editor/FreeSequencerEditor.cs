@@ -235,8 +235,8 @@ namespace FreeSequencer.Editor
 				float end = _maxFrame;
 
 				EditorGUILayout.MinMaxSlider(ref start, ref end, 0, _selectedSequence != null ? _selectedSequence.Length : 1);
-				_minFrame = (int)start;
-				_maxFrame = (int)end;
+				_minFrame = Mathf.Clamp((int)start, 0, _maxFrame - 1);
+				_maxFrame = Mathf.Clamp((int)end, _minFrame + 1, _selectedSequence != null ? _selectedSequence.Length : 1);
 				GUILayout.Space(3f);
 				EditorGUILayout.EndHorizontal();
 
@@ -515,7 +515,7 @@ namespace FreeSequencer.Editor
 				Undo.RecordObject(holder.Track, "Remove event");
 				if (holder.Track.Events.Any(evt => evt == _selectedEvent))
 				{
-					FreeSequanceInspector.Init(GetEditorParameters());
+					FreeSequanceInspector.Init(GetEditorParameters(), new EventParameters(0, _selectedSequence.Length));
 					FreeSequanceInspector.Repaint();
 				}
 
@@ -532,7 +532,7 @@ namespace FreeSequencer.Editor
 				Undo.RecordObject(holder.Track, "Add new event");
 				if (holder.Track.Events.Any(evt => evt == _selectedEvent))
 				{
-					FreeSequanceInspector.Init(GetEditorParameters());
+					FreeSequanceInspector.Init(GetEditorParameters(), new EventParameters(0, _selectedSequence.Length));
 					FreeSequanceInspector.Repaint();
 				}
 
@@ -546,7 +546,34 @@ namespace FreeSequencer.Editor
 					newEvent.EventTitle = "Animation";
 
 					holder.Track.Events.Add(newEvent);
-					FreeSequanceInspector.Init(GetEditorParameters(), _selectedSequence, holder.AnimatedGameObject, holder.Track, newEvent);
+					var minFrame = 0;
+					var maxFrame = _selectedSequence.Length;
+					var orderedEvents = holder.Track.Events.OrderBy(evt => evt.StartFrame).ToArray();
+					for (int i = 0; i < orderedEvents.Length; i++)
+					{
+						var evt = orderedEvents[i];
+						if (evt == newEvent)
+						{
+							if (i > 0)
+							{
+								var prevEvt = orderedEvents[i - 1];
+								if (prevEvt.EndFrame > minFrame)
+								{
+									minFrame = prevEvt.EndFrame;
+								}
+							}
+
+							if (i < orderedEvents.Length - 1)
+							{
+								var nextEvt = orderedEvents[i + 1];
+								if (nextEvt.StartFrame < maxFrame)
+								{
+									maxFrame = nextEvt.StartFrame;
+								}
+							}
+						}
+					}
+					FreeSequanceInspector.Init(GetEditorParameters(), new EventParameters(minFrame, maxFrame), _selectedSequence, holder.AnimatedGameObject, holder.Track, newEvent);
 
 					Repaint();
 					FreeSequanceInspector.Repaint();
@@ -562,7 +589,7 @@ namespace FreeSequencer.Editor
 				Undo.RecordObject(holder.AnimatedGameObject, "Remove track");
 				if (holder.Track.Events.Any(evt => evt == _selectedEvent))
 				{
-					FreeSequanceInspector.Init(GetEditorParameters());
+					FreeSequanceInspector.Init(GetEditorParameters(), new EventParameters(0, _selectedSequence.Length));
 					FreeSequanceInspector.Repaint();
 				}
 				holder.AnimatedGameObject.Tracks.Remove(holder.Track);
@@ -589,7 +616,35 @@ namespace FreeSequencer.Editor
 
 				holder.Event.IsActive = true;
 				_selectedEvent = holder.Event;
-				FreeSequanceInspector.Init(GetEditorParameters(), _selectedSequence, holder.AnimatedGameObject, holder.Track, holder.Event);
+
+				var minFrame = 0;
+				var maxFrame = _selectedSequence.Length;
+				var orderedEvents = holder.Track.Events.OrderBy(evt => evt.StartFrame).ToArray();
+				for (int i = 0; i < orderedEvents.Length; i++)
+				{
+					var evt = orderedEvents[i];
+					if (evt == _selectedEvent)
+					{
+						if (i > 0)
+						{
+							var prevEvt = orderedEvents[i - 1];
+							if (prevEvt.EndFrame > minFrame)
+							{
+								minFrame = prevEvt.EndFrame;
+							}
+						}
+
+						if (i < orderedEvents.Length - 1)
+						{
+							var nextEvt = orderedEvents[i + 1];
+							if (nextEvt.StartFrame < maxFrame)
+							{
+								maxFrame = nextEvt.StartFrame;
+							}
+						}
+					}
+				}
+				FreeSequanceInspector.Init(GetEditorParameters(), new EventParameters(minFrame, maxFrame), _selectedSequence, holder.AnimatedGameObject, holder.Track, holder.Event);
 				FreeSequanceInspector.Repaint();
 
 				var animationEvent = _selectedEvent as AnimationTrackEvent;

@@ -7,6 +7,18 @@ using UnityEngine;
 
 namespace FreeSequencer.Editor
 {
+	public class EventParameters
+	{
+		public int MinFrame;
+		public int MaxFrame;
+
+		public EventParameters(int minFrame, int maxFrame)
+		{
+			MinFrame = minFrame;
+			MaxFrame = maxFrame;
+		}
+	}
+
 	public class FreeSequenceInspector : EditorWindow
 	{
 		private AnimatedGameObject _animatedGameObject;
@@ -16,6 +28,7 @@ namespace FreeSequencer.Editor
 
 		private EditorParameters _lastEditorParameters;
 		private FreeSequencerEditor _freeSequencerEditorWindow;
+		private EventParameters _eventParameters;
 		public event Action<TrackEvent> EventChanged;
 		private FreeSequencerEditor FreeSequanceEditor
 		{
@@ -27,8 +40,9 @@ namespace FreeSequencer.Editor
 			}
 		}
 
-		public void Init(EditorParameters parameters, Sequence selectedSequence = null, AnimatedGameObject animatedGameObject = null, BaseTrack track = null, TrackEvent trackEvent = null)
+		public void Init(EditorParameters parameters, EventParameters eventParameters, Sequence selectedSequence = null, AnimatedGameObject animatedGameObject = null, BaseTrack track = null, TrackEvent trackEvent = null)
 		{
+			_eventParameters = eventParameters;
 			_sequenceName = selectedSequence == null ? string.Empty : selectedSequence.name;
 			_animatedGameObject = animatedGameObject;
 			_track = track;
@@ -239,7 +253,7 @@ namespace FreeSequencer.Editor
 			{
 				Undo.RecordObject(_trackEvent, "Track Event Changed");
 				var prevStartFrame = _trackEvent.StartFrame;
-				_trackEvent.StartFrame = Mathf.Clamp(start, _lastEditorParameters.MinFrame, _trackEvent.EndFrame - 1);
+				_trackEvent.StartFrame = Mathf.Clamp(start, _eventParameters.MinFrame, _trackEvent.EndFrame - 1);
 				if (_trackEvent.StartFrame != prevStartFrame)
 					OnEventChanged(_trackEvent);
 			}
@@ -251,14 +265,14 @@ namespace FreeSequencer.Editor
 			{
 				Undo.RecordObject(_trackEvent, "Track Event Changed");
 				var prevEndFrame = _trackEvent.EndFrame;
-				_trackEvent.EndFrame = Mathf.Clamp(end, _trackEvent.StartFrame + 1, _lastEditorParameters.MaxFrame);
+				_trackEvent.EndFrame = Mathf.Clamp(end, _trackEvent.StartFrame + 1, _eventParameters.MaxFrame);
 				if (_trackEvent.EndFrame != prevEndFrame)
 					OnEventChanged(_trackEvent);
 			}
 			EditorGUILayout.EndHorizontal();
 
 			EditorGUILayout.BeginHorizontal();
-			EditorGUILayout.LabelField(string.Empty, GUILayout.Width(150f));
+			EditorGUILayout.LabelField("Length: " + _trackEvent.Length, GUILayout.Width(150f));
 			float _min = _trackEvent.StartFrame;
 			float _max = _trackEvent.EndFrame;
 			EditorGUI.BeginChangeCheck();
@@ -266,11 +280,11 @@ namespace FreeSequencer.Editor
 			if (EditorGUI.EndChangeCheck())
 			{
 				Undo.RecordObject(_trackEvent, "Track Event Changed");
-				if (!((int)_min < _lastEditorParameters.MinFrame && (int)_max != _trackEvent.EndFrame
-				|| (int)_max > _lastEditorParameters.MaxFrame && (int)_max != _trackEvent.StartFrame))
+				if (!((int)_min < _eventParameters.MinFrame && (int)_max != _trackEvent.EndFrame
+				|| (int)_max > _eventParameters.MaxFrame && (int)_max != _trackEvent.StartFrame))
 				{
-					_trackEvent.StartFrame = Mathf.Clamp((int)_min, _lastEditorParameters.MinFrame, _trackEvent.EndFrame - 1);
-					_trackEvent.EndFrame = Mathf.Clamp((int)_max, _trackEvent.StartFrame + 1, _lastEditorParameters.MaxFrame);
+					_trackEvent.StartFrame = Mathf.Clamp((int)_min, _eventParameters.MinFrame, _trackEvent.EndFrame - 1);
+					_trackEvent.EndFrame = Mathf.Clamp((int)_max, _trackEvent.StartFrame + 1, _eventParameters.MaxFrame);
 					OnEventChanged(_trackEvent);
 				}
 			}
@@ -343,6 +357,20 @@ namespace FreeSequencer.Editor
 								animationEvent.EventTitle = animationEvent.Clip.name;
 								OnEventChanged(animationEvent);
 							}
+						}
+					}
+				}
+
+				if (!animationEvent.ControlAnimation && animationEvent.Clip != null)
+				{
+					if (GUILayout.Button("Resize like Clip"))
+					{
+						var nextEndValue = animationEvent.StartFrame + (int)(animationEvent.Clip.length*animationEvent.Clip.frameRate);
+						if (nextEndValue <= _eventParameters.MaxFrame)
+						{
+							Undo.RecordObject(animationEvent, "Resize animation event");
+							animationEvent.EndFrame = nextEndValue;
+							OnEventChanged(animationEvent);
 						}
 					}
 				}
