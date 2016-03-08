@@ -15,6 +15,11 @@ namespace FreeSequencer.Events
 		public Color EventInnerColor;
 		public Color EventTitleColor;
 
+		public bool IsActive;
+		public bool IsDragged;
+		public bool IsMinDragged;
+		public bool IsMaxDragged;
+		public Vector3 InitialDraggedPosition;
 		public bool IsDirty;
 		public TrackEvent()
 		{

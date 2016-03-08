@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using Assets.Scripts.Editor;
-using Assets.Scripts.Editor.Sequencer;
 using FreeSequencer.Events;
 using FreeSequencer.Tracks;
 using UnityEditor;
-using UnityEditorInternal;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -235,8 +230,6 @@ namespace FreeSequencer.Editor
 							objectsCount++;
 						}
 					}
-
-					//EditorGUILayout.EndToggleGroup();
 				}
 			}
 		}
@@ -915,8 +908,6 @@ namespace FreeSequencer.Editor
 
 		void OnFocus()
 		{
-			// Remove delegate listener if it has previously
-			// been assigned.
 			SceneView.onSceneGUIDelegate -= this.OnSceneGUI;
 			// Add (or re-add) the delegate.
 			SceneView.onSceneGUIDelegate += this.OnSceneGUI;

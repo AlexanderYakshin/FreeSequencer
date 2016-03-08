@@ -3,7 +3,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace Assets.Sequencer.Scripts.Editor
+namespace FreeSequencer.Editor
 {
 	public class AnimationWindowHelper
 	{
@@ -34,7 +34,7 @@ namespace Assets.Sequencer.Scripts.Editor
 		{
 			get
 			{
-				if (AnimationWindow == null)
+				//if (_animationWindow == null)
 					_animationWindow = GetWindowIfExists(ANIMATION_WINDOW_TYPE);
 				return _animationWindow;
 			}
@@ -84,7 +84,7 @@ namespace Assets.Sequencer.Scripts.Editor
 		{
 			get
 			{
-				if (_currentTimeField == null)
+				//if (_currentTimeField == null)
 					_currentTimeField = ANIMATION_WINDOW_STATE_TYPE.GetField("m_CurrentTime", BindingFlags.Instance | BindingFlags.NonPublic);
 				return _currentTimeField;
 			}
@@ -135,6 +135,11 @@ namespace Assets.Sequencer.Scripts.Editor
 			RecordingProperty.SetValue(GetState(), true, null);
 		}
 
+		public static void StopAnimationMode()
+		{
+			RecordingProperty.SetValue(GetState(), false, null);
+		}
+
 		private static object GetState()
 		{
 			return StateField.GetValue(AnimEditor);
@@ -145,7 +150,7 @@ namespace Assets.Sequencer.Scripts.Editor
 			if (AnimationWindow == null)
 				return;
 			CurrentTimeField.SetValue(GetState(), time);
-			_animationWindow.Repaint();
+			AnimationWindow.Repaint();
 		}
 
 		public static int GetCurrentFrame()
@@ -161,12 +166,18 @@ namespace Assets.Sequencer.Scripts.Editor
 				return;
 			AnimationClip[] animationClips = AnimationUtility.GetAnimationClips(Selection.activeGameObject);
 			int index = 0;
-			while (index != animationClips.Length && animationClips[index] == clip)
-				++index;
+			while (index < animationClips.Length)
+			{
+				if (animationClips[index] == clip)
+					break;
+
+				index++;
+			}
 			if (index == animationClips.Length)
 				Debug.LogError("Couldn't find clip " + clip.name);
 			else
 				ActiveAnimationClipProperty.SetValue(GetState(), clip, null);
+			AnimationWindow.Repaint();
 		}
 	}
 }

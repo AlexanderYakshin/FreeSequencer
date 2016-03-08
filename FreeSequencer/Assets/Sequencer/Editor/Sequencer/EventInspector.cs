@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using FreeSequencer.Events;
 using FreeSequencer.Tracks;
@@ -167,13 +166,6 @@ namespace FreeSequencer.Editor
 
 			EditorGUILayout.BeginVertical();
 			EditorGUILayout.LabelField("Track Tools:", GUILayout.Width(150f));
-
-			/*EditorGUILayout.BeginHorizontal();
-
-			EditorGUILayout.LabelField("Sync Animation Window", GUILayout.Width(150f));
-			_currentTrack.SyncAnimationWindow = EditorGUILayout.Toggle(_currentTrack.SyncAnimationWindow);
-
-			EditorGUILayout.EndHorizontal();*/
 
 			EditorGUILayout.BeginHorizontal();
 

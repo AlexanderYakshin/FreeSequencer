@@ -1,13 +1,13 @@
 ﻿using FreeSequencer;
-using FreeSequencer.Events;
 using FreeSequencer.Tracks;
 
-namespace Assets.Scripts.Editor.Sequencer
+namespace FreeSequencer.Editor
 {
-	public class RemoveEventHolder
+	public class AddEventHolder
 	{
+		public int StartFrame;
+		public int EndFrame;
 		public BaseTrack Track;
 		public AnimatedGameObject AnimatedGameObject;
-		public TrackEvent Event;
 	}
 }
