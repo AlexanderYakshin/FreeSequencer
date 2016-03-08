@@ -16,7 +16,6 @@ namespace FreeSequencer.Editor
 
 		private EditorParameters _lastEditorParameters;
 		private FreeSequencerEditor _freeSequencerEditorWindow;
-		private Sequence _selectedSequence;
 		public event Action<TrackEvent> EventChanged;
 		private FreeSequencerEditor FreeSequanceEditor
 		{
@@ -30,7 +29,6 @@ namespace FreeSequencer.Editor
 
 		public void Init(EditorParameters parameters, Sequence selectedSequence = null, AnimatedGameObject animatedGameObject = null, BaseTrack track = null, TrackEvent trackEvent = null)
 		{
-			_selectedSequence = selectedSequence;
 			_sequenceName = selectedSequence == null ? string.Empty : selectedSequence.name;
 			_animatedGameObject = animatedGameObject;
 			_track = track;
@@ -41,6 +39,7 @@ namespace FreeSequencer.Editor
 
 		private void OnGUI()
 		{
+			this.titleContent = new GUIContent("Event Inspector");
 			if (_lastEditorParameters == null)
 				return;
 			if (_trackEvent != null)

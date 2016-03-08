@@ -46,8 +46,6 @@ namespace FreeSequencer.Editor
 				return _freeSequencerInspectorWindow;
 			}
 		}
-
-		private static FreeSequencerEditor _freeSequencerEditorWindow;
 		private static FreeSequenceInspector _freeSequencerInspectorWindow;
 		private TimeLineArea _timeLineEditorArea;
 		private Vector2 _scrollPosition;
@@ -56,7 +54,6 @@ namespace FreeSequencer.Editor
 
 		void OnEnable()
 		{
-			_freeSequencerEditorWindow = this;
 			_minFrame = 0;
 			_maxFrame = 1;
 			_speed = 1f;
@@ -135,11 +132,13 @@ namespace FreeSequencer.Editor
 			AnimatiedGameObjectEditor.AddEvent -= OnAddEvent;
 			AnimatiedGameObjectEditor.RemoveEvent -= OnRemoveEvent;
 			AnimatiedGameObjectEditor.OnEventDragged -= OnEventDragged;
+			AnimatiedGameObjectEditor.GenerateTrack -= GenerateAnimatorStateMachine;
+			AnimatiedGameObjectEditor.Move -= OnMove;
 
 			FreeSequanceInspector.EventChanged -= OnTrackEventChanged;
 		}
 
-		[MenuItem("FreeSequencer/Editor1")]
+		[MenuItem("FreeSequencer/Editor")]
 		static void ShowEditor()
 		{
 			GetWindow<FreeSequencerEditor>();
@@ -161,7 +160,6 @@ namespace FreeSequencer.Editor
 
 		private void OnGUI()
 		{
-			var width = position.width;
 			var height = position.height;
 			GUILayout.BeginVertical(GUILayout.ExpandWidth(true));
 			GUILayout.Space(3f);
@@ -222,33 +220,38 @@ namespace FreeSequencer.Editor
 				GUILayout.EndScrollView();
 				GUILayout.Space(5f);
 				GUILayout.EndHorizontal();
+
+
+				var timelineRect = new Rect(START_TIMELINE_X, 50f, position.width - START_TIMELINE_X - END_TIMELINE_OFFSET_X, position.height - 100f);
+				GUILayout.BeginArea(timelineRect);
+				_timeLineEditorArea.OnDraw(timeLineParameters, timelineRect);
+				GUILayout.EndArea();
+
+				var framesRect = new Rect(15f, position.height - 50f, position.width - 30f, 25f);
+				GUILayout.BeginArea(framesRect);
+				GUILayout.Space(3f);
+				EditorGUILayout.BeginHorizontal(GUILayout.Height(25f));
+				float start = _minFrame;
+				float end = _maxFrame;
+
+				EditorGUILayout.MinMaxSlider(ref start, ref end, 0, _selectedSequence != null ? _selectedSequence.Length : 1);
+				_minFrame = (int)start;
+				_maxFrame = (int)end;
+				GUILayout.Space(3f);
+				EditorGUILayout.EndHorizontal();
+
+				GUILayout.EndArea();
+				var controlsRect = new Rect(15f, position.height - 25f, position.width - 30f, 25f);
+				GUILayout.BeginArea(controlsRect);
+				DrawTimeControls();
+				GUILayout.EndArea();
+
+				HandlePlayingAnimation();
 			}
-
-			var timelineRect = new Rect(START_TIMELINE_X, 50f, position.width - START_TIMELINE_X - END_TIMELINE_OFFSET_X, position.height - 100f);
-			GUILayout.BeginArea(timelineRect);
-			_timeLineEditorArea.OnDraw(timeLineParameters, timelineRect);
-			GUILayout.EndArea();
-
-			var framesRect = new Rect(15f, position.height - 50f, position.width - 30f, 25f);
-			GUILayout.BeginArea(framesRect);
-			GUILayout.Space(3f);
-			EditorGUILayout.BeginHorizontal(GUILayout.Height(25f));
-			float start = _minFrame;
-			float end = _maxFrame;
-
-			EditorGUILayout.MinMaxSlider(ref start, ref end, 0, _selectedSequence != null ? _selectedSequence.Length : 1);
-			_minFrame = (int)start;
-			_maxFrame = (int)end;
-			GUILayout.Space(3f);
-			EditorGUILayout.EndHorizontal();
-
-			GUILayout.EndArea();
-			var controlsRect = new Rect(15f, position.height - 25f, position.width - 30f, 25f);
-			GUILayout.BeginArea(controlsRect);
-			DrawTimeControls();
-			GUILayout.EndArea();
-
-			HandlePlayingAnimation();
+			else
+			{
+				this.ShowNotification(new GUIContent("Choose any sequence"));
+			}
 		}
 
 		private void DrawTimeControls()
@@ -292,7 +295,7 @@ namespace FreeSequencer.Editor
 
 			EditorGUILayout.LabelField("Speed", GUILayout.Width(50f));
 			_speed = EditorGUILayout.Slider(_speed, 0.25f, 3f, GUILayout.Width(120f));
-			_speed = (int) (_speed/0.25f)*0.25f;
+			_speed = (int)(_speed / 0.25f) * 0.25f;
 			if (_speed < 0.01f)
 				_speed = 0.25f;
 			GUILayout.FlexibleSpace();
@@ -1255,7 +1258,6 @@ namespace FreeSequencer.Editor
 						AnimationUtility.SetEditorCurve(animEvent.Clip, curveBindingX, curveX);
 						AnimationUtility.SetEditorCurve(animEvent.Clip, curveBindingY, curveY);
 						AnimationUtility.SetEditorCurve(animEvent.Clip, curveBindingZ, curveZ);
-						var settings = AnimationUtility.GetAnimationClipSettings(animEvent.Clip);
 						animEvent.Clip.EnsureQuaternionContinuity();
 
 						return;
@@ -1364,7 +1366,7 @@ namespace FreeSequencer.Editor
 
 		private void GenerateAnimatorStateMachine(AnimationTrack animationTrack)
 		{
-			if (_selectedSequence == null || animationTrack.Controller == null || !animationTrack.Events.Any() || animationTrack.Events.Any(ev=> ((AnimationTrackEvent)ev).Clip == null))
+			if (_selectedSequence == null || animationTrack.Controller == null || !animationTrack.Events.Any() || animationTrack.Events.Any(ev => ((AnimationTrackEvent)ev).Clip == null))
 				return;
 
 			var controller = animationTrack.Controller as UnityEditor.Animations.AnimatorController;

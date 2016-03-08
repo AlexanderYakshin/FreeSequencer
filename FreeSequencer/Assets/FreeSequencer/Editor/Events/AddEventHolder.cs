@@ -1,5 +1,4 @@
-﻿using FreeSequencer;
-using FreeSequencer.Tracks;
+﻿using FreeSequencer.Tracks;
 
 namespace FreeSequencer.Editor
 {

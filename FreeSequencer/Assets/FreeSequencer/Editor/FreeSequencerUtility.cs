@@ -14,7 +14,7 @@ namespace FreeSequencer.Editor
 
 		public static string FindDirectory()
 		{
-			var directories = Directory.GetDirectories("Assets", "Sequencer", SearchOption.AllDirectories);
+			var directories = Directory.GetDirectories("Assets", "FreeSequencer", SearchOption.AllDirectories);
 			return directories.Length > 0 ? directories[0] : string.Empty;
 		}
 

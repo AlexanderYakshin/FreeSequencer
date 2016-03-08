@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Threading;
 using FreeSequencer.Events;
 using FreeSequencer.Tracks;
 using UnityEditor;
