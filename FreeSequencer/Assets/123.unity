@@ -283,15 +283,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   EventTitle: Main Camera_GameObject
-  StartFrame: 198
-  EndFrame: 396
+  StartFrame: 246
+  EndFrame: 444
   EventInnerColor: {r: 0, g: 0, b: 1, a: 1}
   EventTitleColor: {r: 1, g: 1, b: 1, a: 1}
-  IsActive: 0
+  IsActive: 1
   IsDragged: 0
   IsMinDragged: 0
   IsMaxDragged: 0
-  InitialDraggedPosition: {x: 584, y: 12, z: 0}
+  InitialDraggedPosition: {x: 375, y: 3, z: 0}
   IsDirty: 0
   Clip: {fileID: 7400000, guid: a9883bc85d36c9342b3e6ccc07ffaa1e, type: 2}
   ControlAnimation: 0
@@ -1801,11 +1801,11 @@ MonoBehaviour:
   EndFrame: 198
   EventInnerColor: {r: 0, g: 0, b: 1, a: 1}
   EventTitleColor: {r: 1, g: 1, b: 1, a: 1}
-  IsActive: 1
+  IsActive: 0
   IsDragged: 0
   IsMinDragged: 0
   IsMaxDragged: 0
-  InitialDraggedPosition: {x: 315, y: 14, z: 0}
+  InitialDraggedPosition: {x: 202, y: 2, z: 0}
   IsDirty: 0
   Clip: {fileID: 7400000, guid: a9883bc85d36c9342b3e6ccc07ffaa1e, type: 2}
   ControlAnimation: 1
@@ -1846,7 +1846,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2078692308}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 9.595959, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1518405473}
@@ -1950,8 +1950,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2114974903}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.8522778, y: -0.31493044, z: -6.9573226}
+  m_LocalRotation: {x: 0.072494686, y: 0.8470469, z: 0.04675432, w: 0.5244712}
+  m_LocalPosition: {x: 2.7158546, y: 9.486164, z: -21.383684}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 2078692309}
