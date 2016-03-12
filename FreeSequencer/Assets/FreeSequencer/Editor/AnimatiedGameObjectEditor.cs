@@ -171,8 +171,8 @@ namespace FreeSequencer.Editor
 			var startFr = trackEvent.StartFrame - parameters.MinFrame;
 			var start = Mathf.Clamp(startFr, 0, frameLength);
 			var endFr = trackEvent.EndFrame - parameters.MinFrame;
-			var end = Mathf.Clamp(endFr, 0, frameLength);
-			var rect = new Rect(start * x_dif, 0, end * x_dif, RowHeight);
+			var end = endFr > 0 && frameLength > endFr ? endFr : frameLength;
+			var rect = new Rect(start * x_dif, 0, (end - start) * x_dif, RowHeight);
 			if (Event.current.type == EventType.Repaint)
 			{
 				evtStyle.Draw(rect, false, trackEvent.IsActive, false, false);

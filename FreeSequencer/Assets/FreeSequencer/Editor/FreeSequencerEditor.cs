@@ -1449,8 +1449,8 @@ namespace FreeSequencer.Editor
 			for (int i = 0; i < events.Count; i++)
 			{
 				var evt = events[i] as AnimationTrackEvent;
-
-				if (evt.StartFrame > lastEndFrame)
+				
+				if (i == 0 && evt.StartFrame > lastEndFrame)
 				{
 					var prevEvtState = seqStateMachine.states.Select(st => st.state)
 						.FirstOrDefault(st => st.name.Equals(evt.EventTitle + "_Prev"));
@@ -1491,11 +1491,32 @@ namespace FreeSequencer.Editor
 					var firstState = prevState ?? evtState;
 					seqStateMachine.AddEntryTransition(firstState);
 				}
-				else
+
+				if (prevState != null)
 				{
 					var tran = prevState.AddTransition(evtState);
 					tran.duration = 0f;
-					tran.exitTime = (float)(evt.StartFrame - lastEndFrame) / _selectedSequence.FrameRate;
+					if (i == 0)
+					{
+						var exitTime = evt.StartFrame - lastEndFrame;
+						tran.exitTime = (exitTime == 0 ? 1f : (float) exitTime/_selectedSequence.FrameRate);
+					}
+					else
+					{
+						var duration = evt.StartFrame - lastEndFrame;
+						var prevEvt = events[i - 1] as AnimationTrackEvent;
+						var exitTime = 1f;
+						if (!prevEvt.ControlAnimation)
+						{
+							var prevClipFrames = prevEvt.Clip.length * prevEvt.Clip.frameRate;
+							var prevEventLength = prevEvt.Length;
+							exitTime = prevEventLength / prevClipFrames;
+						}
+						
+						if (duration > 0)
+							exitTime += ((float)duration / _selectedSequence.FrameRate) / evt.Clip.length;
+						tran.exitTime = exitTime;
+					}
 					tran.hasExitTime = true;
 				}
 
@@ -1506,7 +1527,7 @@ namespace FreeSequencer.Editor
 				{
 					if (lastEndFrame < _selectedSequence.Length)
 					{
-						var nexEvtState = seqStateMachine.states.Select(st => st.state)
+						/*var nexEvtState = seqStateMachine.states.Select(st => st.state)
 						.FirstOrDefault(st => st.name.Equals(evt.EventTitle + "_Last"));
 						if (nexEvtState == null)
 						{
@@ -1524,18 +1545,36 @@ namespace FreeSequencer.Editor
 						var tran2 = prevState.AddTransition(nexEvtState);
 						tran2.duration = 0f;
 						tran2.exitTime = exitTime;
-						tran2.hasExitTime = true;
+						tran2.hasExitTime = true;*/
 
-						var tran3 = nexEvtState.AddExitTransition();
+						var tran3 = prevState.AddExitTransition();
 						tran3.duration = 0f;
-						tran3.exitTime = (float)(_selectedSequence.Length - lastEndFrame) / _selectedSequence.FrameRate;
+						var duration = _selectedSequence.Length - lastEndFrame;
+						var exitTime = 1f;
+						if (!evt.ControlAnimation)
+						{
+							var prevClipFrames = evt.Clip.length * evt.Clip.frameRate;
+							var prevEventLength = evt.Length;
+							exitTime = prevEventLength / prevClipFrames;
+						}
+
+						if (duration > 0)
+							exitTime += ((float)duration / _selectedSequence.FrameRate) / evt.Clip.length;
+						tran3.exitTime = exitTime;
 						tran3.hasExitTime = true;
 					}
 					else
 					{
 						var tran3 = prevState.AddExitTransition();
 						tran3.duration = 0f;
-						tran3.exitTime = 1;
+						var exitTime = 1f;
+						if (!evt.ControlAnimation)
+						{
+							var prevClipFrames = evt.Clip.length * evt.Clip.frameRate;
+							var prevEventLength = evt.Length;
+							exitTime = prevEventLength / prevClipFrames;
+						}
+						tran3.exitTime = exitTime;
 						tran3.hasExitTime = true;
 					}
 				}
