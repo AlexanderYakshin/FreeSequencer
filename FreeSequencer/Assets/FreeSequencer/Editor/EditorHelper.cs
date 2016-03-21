@@ -23,7 +23,7 @@ namespace FreeSequencer.Editor
 
 		public static bool GetMouseUp(int button = 0)
 		{
-			return Event.current.type == EventType.mouseUp;
+			return Event.current.rawType == EventType.mouseUp;
 		}
 
 		public static bool GetMouseDown(int button = 0)

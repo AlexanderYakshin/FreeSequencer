@@ -7,6 +7,13 @@ using UnityEngine;
 
 namespace FreeSequencer.Editor
 {
+	public enum DragType
+	{
+		OnDrag,
+		OnMinDrag,
+		OnMaxDrag
+	}
+
 	public static class AnimatiedGameObjectEditor
 	{
 		public const float RowHeight = 25f;
@@ -15,6 +22,8 @@ namespace FreeSequencer.Editor
 		public static event Action<RemoveTrackHolder> RemoveTrack;
 		public static event Action<EventSelectionHolder> OnEventSelection;
 		public static event Action<EventSelectionHolder> OnEventDragged;
+		public static event Action<TrackEventDragHolder> DraggedEvent;
+
 		public static event Action<AddEventHolder> AddEvent;
 		public static event Action<RemoveEventHolder> RemoveEvent;
 		public static event Action<AnimationTrack> GenerateTrack;
@@ -105,15 +114,15 @@ namespace FreeSequencer.Editor
 			var frameLength = parameters.MaxFrame - parameters.MinFrame;
 			var x_dif = eventsRect.width / frameLength;
 
-			var startFr = startFrame;
+			var startFr = startFrame - parameters.MinFrame;
 			var start = Mathf.Clamp(startFr, 0, frameLength);
-			var end = Mathf.Clamp(endFrame - startFr, 0, frameLength);
+			var end = Mathf.Clamp(endFrame - startFr - parameters.MinFrame, 0, frameLength);
 			var rect = new Rect(start * x_dif, 0, end * x_dif, RowHeight);
 			if (EditorHelper.GetMouseDownRect(rect, 1))
 			{
 				var mousePos = Event.current.mousePosition;
 				GenericMenu toolsMenu = new GenericMenu();
-				toolsMenu.AddItem(new GUIContent("Add new event"), false, OnAddEvent, new AddEventHolder() { StartFrame = startFr, EndFrame = endFrame, Track = track, AnimatedGameObject = animatedGameObject });
+				toolsMenu.AddItem(new GUIContent("Add new event"), false, OnAddEvent, new AddEventHolder() { StartFrame = startFrame, EndFrame = endFrame, Track = track, AnimatedGameObject = animatedGameObject });
 				toolsMenu.DropDown(new Rect(mousePos.x, mousePos.y, 0, 0));
 				GUIUtility.ExitGUI();
 			}
@@ -178,13 +187,20 @@ namespace FreeSequencer.Editor
 				evtStyle.Draw(rect, false, trackEvent.IsActive, false, false);
 			}
 
+			if (trackEvent.IsActive)
+			{
+				var color = Handles.color;
+				Handles.color = new Color(1, 1, 1, 0.3f);
+				Handles.DrawSolidRectangleWithOutline(rect, new Color(1, 1, 1, 0.3f), new Color(0, 0, 0, 0));
+				Handles.color = color;
+			}
+
 			GUILayout.BeginArea(rect);
 			GUILayout.Label(trackEvent.EventTitle);
 			GUILayout.EndArea();
 
-			var minRect = new Rect(start*x_dif, 0, 5f, RowHeight);
-			var maxRect = new Rect(start*x_dif + end*x_dif - 5f, 0, 5f, RowHeight);
-
+			var minRect = new Rect(start * x_dif, 0, 5f, RowHeight);
+			var maxRect = new Rect(start * x_dif + (end - start) * x_dif - 5f, 0, 5f, RowHeight);
 			if (EditorHelper.GetMouseDown())
 			{
 				var wasDrag = false;
@@ -204,6 +220,9 @@ namespace FreeSequencer.Editor
 							Event = trackEvent,
 							Track = track
 						};
+
+						holder.ResetSelection = !Event.current.shift;
+
 						OnEventSelection(holder);
 					}
 					trackEvent.InitialDraggedPosition = Event.current.mousePosition;
@@ -234,7 +253,7 @@ namespace FreeSequencer.Editor
 					var initialPosition = trackEvent.InitialDraggedPosition;
 
 					var difX = initialPosition.x - position.x;
-					int framesDif = (int) (difX/x_dif)*-1;
+					int framesDif = (int)(difX / x_dif) * -1;
 					if (Mathf.Abs(framesDif) > 0)
 					{
 						var newStartFrame = trackEvent.StartFrame + framesDif;
@@ -248,9 +267,19 @@ namespace FreeSequencer.Editor
 
 						if (trackEvent.IsDragged)
 						{
-							var eventLenth = trackEvent.Length;
+							if (DraggedEvent != null)
+							{
+								DraggedEvent(new TrackEventDragHolder()
+								{
+									AnimatedGameObject = animatedGameObject,
+									TrackEvent = trackEvent,
+									Track = track,
+									Step = framesDif
+								});
+							}
+							/*var eventLenth = trackEvent.Length;
 							trackEvent.StartFrame = Mathf.Clamp(newStartFrame, minFrame, maxFrame - eventLenth);
-							trackEvent.EndFrame = Mathf.Clamp(newEndFrame, trackEvent.StartFrame + eventLenth, maxFrame);
+							trackEvent.EndFrame = Mathf.Clamp(newEndFrame, trackEvent.StartFrame + eventLenth, maxFrame);*/
 						}
 
 						if (OnEventDragged != null)
@@ -291,7 +320,7 @@ namespace FreeSequencer.Editor
 						MoveRight = false
 					};
 
-					
+
 					toolsMenu.AddSeparator(string.Empty);
 					toolsMenu.AddItem(new GUIContent("Move left"), false, OnMove, moveLeftHolder);
 				}
@@ -314,6 +343,32 @@ namespace FreeSequencer.Editor
 			}
 
 			GUI.backgroundColor = backgroundColor;
+		}
+
+		public static void Drag(AnimatedGameObject animatedGameObject, BaseTrack track, TrackEvent trackEvent, int framesDif, int minFrame, int maxFrame)
+		{
+			if (Mathf.Abs(framesDif) > 0)
+			{
+				var newStartFrame = trackEvent.StartFrame + framesDif;
+				var newEndFrame = trackEvent.EndFrame + framesDif;
+
+				if (trackEvent.IsDragged)
+				{
+					var eventLenth = trackEvent.Length;
+					trackEvent.StartFrame = Mathf.Clamp(newStartFrame, minFrame, maxFrame - eventLenth);
+					trackEvent.EndFrame = Mathf.Clamp(newEndFrame, trackEvent.StartFrame + eventLenth, maxFrame);
+				}
+
+				if (OnEventDragged != null)
+				{
+					OnEventDragged(new EventSelectionHolder()
+					{
+						AnimatedGameObject = animatedGameObject,
+						Event = trackEvent,
+						Track = track
+					});
+				}
+			}
 		}
 
 		private static void OnMove(object userdata)

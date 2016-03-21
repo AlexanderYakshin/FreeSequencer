@@ -35,6 +35,7 @@ namespace FreeSequencer.Editor
 
 		private Sequence _selectedSequence;
 		private TrackEvent _selectedEvent;
+		private AnimatedGameObject _selectedAnimObject;
 		private SequenceEditorArea _sequenceEditorArea;
 
 		private FreeSequenceInspector FreeSequanceInspector
@@ -51,6 +52,7 @@ namespace FreeSequencer.Editor
 		private Vector2 _scrollPosition;
 		private bool _prevIsPlaing;
 		private float _playTime;
+		private int _dragStep;
 
 		void OnEnable()
 		{
@@ -85,6 +87,7 @@ namespace FreeSequencer.Editor
 			AnimatiedGameObjectEditor.OnEventDragged += OnEventDragged;
 			AnimatiedGameObjectEditor.GenerateTrack += GenerateAnimatorStateMachine;
 			AnimatiedGameObjectEditor.Move += OnMove;
+			AnimatiedGameObjectEditor.DraggedEvent += OnDragEvent;
 
 			FreeSequanceInspector.EventChanged += OnTrackEventChanged;
 		}
@@ -293,6 +296,20 @@ namespace FreeSequencer.Editor
 
 			GUILayout.FlexibleSpace();
 
+			if (GUILayout.Button("<<Drag", EditorStyles.toolbarButton, GUILayout.Width(50f)))
+			{
+				OnDrag(false, _dragStep);
+			}
+
+			var dragStep = EditorGUILayout.IntField(_dragStep, GUILayout.Width(40f));
+			_dragStep = Mathf.Clamp(dragStep, 0, 100);
+			if (GUILayout.Button("Drag>>", EditorStyles.toolbarButton, GUILayout.Width(50f)))
+			{
+				OnDrag(true, _dragStep);
+			}
+
+			GUILayout.FlexibleSpace();
+
 			EditorGUILayout.LabelField("Speed", GUILayout.Width(50f));
 			_speed = EditorGUILayout.Slider(_speed, 0.25f, 3f, GUILayout.Width(120f));
 			_speed = (int)(_speed / 0.25f) * 0.25f;
@@ -425,7 +442,6 @@ namespace FreeSequencer.Editor
 		private void OnEventDragged(EventSelectionHolder obj)
 		{
 			Undo.RecordObject(obj.Event, "Drag event");
-			Repaint();
 			FreeSequanceInspector.Repaint();
 			OnTrackEventChanged(obj.Event);
 		}
@@ -603,20 +619,23 @@ namespace FreeSequencer.Editor
 		{
 			if (_selectedSequence != null)
 			{
-				foreach (var animatedGameObject in _selectedSequence.Objects)
+				if (holder.ResetSelection)
 				{
-					foreach (var baseTrack in animatedGameObject.Tracks)
+					foreach (var animatedGameObject in _selectedSequence.Objects)
 					{
-						foreach (var trackEvent in baseTrack.Events)
+						foreach (var baseTrack in animatedGameObject.Tracks)
 						{
-							trackEvent.IsActive = false;
+							foreach (var trackEvent in baseTrack.Events)
+							{
+								trackEvent.IsActive = false;
+							}
 						}
 					}
 				}
 
 				holder.Event.IsActive = true;
 				_selectedEvent = holder.Event;
-
+				_selectedAnimObject = holder.AnimatedGameObject;
 				var minFrame = 0;
 				var maxFrame = _selectedSequence.Length;
 				var orderedEvents = holder.Track.Events.OrderBy(evt => evt.StartFrame).ToArray();
@@ -646,7 +665,7 @@ namespace FreeSequencer.Editor
 				}
 				FreeSequanceInspector.Init(GetEditorParameters(), new EventParameters(minFrame, maxFrame), _selectedSequence, holder.AnimatedGameObject, holder.Track, holder.Event);
 				FreeSequanceInspector.Repaint();
-
+				Repaint();
 				var animationEvent = _selectedEvent as AnimationTrackEvent;
 				if (animationEvent != null)
 				{
@@ -1449,7 +1468,7 @@ namespace FreeSequencer.Editor
 			for (int i = 0; i < events.Count; i++)
 			{
 				var evt = events[i] as AnimationTrackEvent;
-				
+
 				if (i == 0 && evt.StartFrame > lastEndFrame)
 				{
 					var prevEvtState = seqStateMachine.states.Select(st => st.state)
@@ -1499,7 +1518,7 @@ namespace FreeSequencer.Editor
 					if (i == 0)
 					{
 						var exitTime = evt.StartFrame - lastEndFrame;
-						tran.exitTime = (exitTime == 0 ? 1f : (float) exitTime/_selectedSequence.FrameRate);
+						tran.exitTime = (exitTime == 0 ? 1f : (float)exitTime / _selectedSequence.FrameRate);
 					}
 					else
 					{
@@ -1512,7 +1531,7 @@ namespace FreeSequencer.Editor
 							var prevEventLength = prevEvt.Length;
 							exitTime = prevEventLength / prevClipFrames;
 						}
-						
+
 						if (duration > 0)
 							exitTime += ((float)duration / _selectedSequence.FrameRate) / evt.Clip.length;
 						tran.exitTime = exitTime;
@@ -1593,5 +1612,99 @@ namespace FreeSequencer.Editor
 		}
 
 		#endregion
+
+		private void OnDragEvent(TrackEventDragHolder trackEventDragHolder)
+		{
+			var rightWay = trackEventDragHolder.Step >= 0;
+
+			OnDrag(rightWay, Mathf.Abs(trackEventDragHolder.Step));
+		}
+
+		private void OnDrag(bool rigthWay, int step)
+		{
+			var counts = 0;
+			var selectedEvents = new List<TrackEventDragHolder>();
+			if (_selectedSequence == null && _selectedAnimObject == null || _selectedAnimObject.Tracks.Count == 0)
+				return;
+			var resultMax = _selectedSequence.Length;
+			var minDifMax = int.MaxValue;
+			var resultMin = 0;
+			var minDifMin = int.MaxValue;
+			BaseTrack minTrack = null;
+			BaseTrack maxTrack = null;
+			foreach (var track in _selectedAnimObject.Tracks)
+			{
+				var localSelectedEvents = new List<TrackEventDragHolder>();
+				var events = track.Events.OrderBy(evt => evt.StartFrame).ToList();
+				var sel = true;
+				for (int i = 0; i < events.Count; i++)
+				{
+					var trackEvent = events[i];
+					if (trackEvent.IsActive)
+					{
+						if (!sel)
+						{
+							sel = true;
+							localSelectedEvents.Clear();
+						}
+						var minFrame = i == 0 ? 0 : events[i - 1].EndFrame;
+						var maxFrame = i == events.Count - 1 ? _selectedSequence.Length : events[i + 1].StartFrame;
+						localSelectedEvents.Add(new TrackEventDragHolder() { Track = track, TrackEvent = trackEvent, Min = minFrame, Max = maxFrame });
+						counts++;
+					}
+					else
+					{
+						sel = false;
+					}
+				}
+
+				if (localSelectedEvents.Any())
+				{
+					var local = localSelectedEvents.OrderBy(evt => evt.TrackEvent.EndFrame).LastOrDefault();
+					var localMax = local.Max;
+					var localDifMax = local.Max - local.TrackEvent.EndFrame;
+					if (localDifMax < minDifMax)
+					{
+						resultMax = localMax;
+						maxTrack = track;
+						minDifMax = localDifMax;
+					}
+
+					local = localSelectedEvents.OrderBy(evt => evt.TrackEvent.StartFrame).FirstOrDefault();
+					var localMin = local.Min;
+					var localDifMin = local.TrackEvent.StartFrame - local.Min;
+					if (localDifMin < minDifMin)
+					{
+						resultMin = localMin;
+						minTrack = track;
+						minDifMin = localDifMin;
+					}
+					selectedEvents.AddRange(localSelectedEvents);
+				}
+			}
+
+
+			if (selectedEvents.Count <= 0 || selectedEvents.Count != counts || maxTrack == null || minTrack == null)
+				return;
+
+			var lastEvent = selectedEvents.Where(evt => evt.Track == maxTrack)
+				.OrderBy(evt => evt.TrackEvent.EndFrame).LastOrDefault();
+			var firstEvent = selectedEvents.Where(evt => evt.Track == minTrack)
+				.OrderBy(evt => evt.TrackEvent.StartFrame).FirstOrDefault();
+			var resultStep = rigthWay ? step : step * -1;
+
+			if (rigthWay && lastEvent.TrackEvent.EndFrame + resultStep > resultMax
+				|| !rigthWay && firstEvent.TrackEvent.StartFrame + resultStep < resultMin)
+				return;
+
+			foreach (var trackEventDragHolder in selectedEvents)
+			{
+				trackEventDragHolder.TrackEvent.StartFrame += resultStep;
+				trackEventDragHolder.TrackEvent.EndFrame += resultStep;
+			}
+
+			FreeSequanceInspector.Repaint();
+			Repaint();
+		}
 	}
 }

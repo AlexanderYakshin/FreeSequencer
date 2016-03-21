@@ -3,11 +3,13 @@ using FreeSequencer.Tracks;
 
 namespace FreeSequencer.Editor
 {
-	public class EventSelectionHolder
+	public class TrackEventDragHolder
 	{
-		public bool ResetSelection;
-		public TrackEvent Event;
 		public BaseTrack Track;
 		public AnimatedGameObject AnimatedGameObject;
+		public TrackEvent TrackEvent;
+		public int Step;
+		public int Min;
+		public int Max;
 	}
 }
