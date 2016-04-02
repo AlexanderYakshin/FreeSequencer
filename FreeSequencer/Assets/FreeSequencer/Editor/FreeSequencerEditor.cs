@@ -715,6 +715,12 @@ namespace FreeSequencer.Editor
 						{
 							var animationFrame = CurrentFrameNumber - animationEvent.StartFrame;
 							var currentTime = animationFrame / animationEvent.Clip.frameRate;
+							var framesLength = animationEvent.Clip.length * animationEvent.Clip.frameRate;
+							if (animationEvent.Clip.isLooping)
+							{
+								currentTime = animationFrame % framesLength / animationEvent.Clip.frameRate;
+							}
+
 							if (animationEvent.ControlAnimation)
 							{
 								if (currentTime < 0 || currentTime > animationEvent.Clip.length)
@@ -809,7 +815,13 @@ namespace FreeSequencer.Editor
 				}
 
 				var frameNumber = CurrentFrameNumber - animationTrackEvent.StartFrame;
-				animationTrackEvent.Clip.SampleAnimation(gameObject, (float)frameNumber / animationTrackEvent.Clip.frameRate);
+				var time = (float)frameNumber / animationTrackEvent.Clip.frameRate;
+				var framesLength = animationTrackEvent.Clip.length*animationTrackEvent.Clip.frameRate;
+				if (animationTrackEvent.Clip.isLooping)
+				{
+					time = (float)frameNumber % framesLength / animationTrackEvent.Clip.frameRate;
+				}
+				animationTrackEvent.Clip.SampleAnimation(gameObject, time);
 			}
 		}
 
@@ -1624,7 +1636,7 @@ namespace FreeSequencer.Editor
 		{
 			var counts = 0;
 			var selectedEvents = new List<TrackEventDragHolder>();
-			if (_selectedSequence == null && _selectedAnimObject == null || _selectedAnimObject.Tracks.Count == 0)
+			if (_selectedSequence == null || _selectedAnimObject == null || _selectedAnimObject.Tracks.Count == 0)
 				return;
 			var resultMax = _selectedSequence.Length;
 			var minDifMax = int.MaxValue;

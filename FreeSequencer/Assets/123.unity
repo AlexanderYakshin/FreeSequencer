@@ -113,218 +113,6 @@ MonoBehaviour:
   - {fileID: 1724378717}
   Controller: {fileID: 9100000, guid: cda70ca38a6badd46a2ca8ed1d61ee4a, type: 2}
   ControllerLayer: 
---- !u!1 &109444670
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 109444671}
-  - 114: {fileID: 109444672}
-  m_Layer: 0
-  m_Name: Play Animation
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &109444671
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 109444670}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 1623175791}
-  m_Father: {fileID: 1724253637}
-  m_RootOrder: 2
---- !u!114 &109444672
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 109444670}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1936026954, guid: 0925728172e9042b89d36127d7238edc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _id: 2
-  _timeline: {fileID: 1724253636}
-  _evtTypeStr: 466c75782e46506c6179416e696d6174696f6e4576656e74
-  _events:
-  - {fileID: 1623175792}
-  _alwaysUseCache: 0
-  _cacheMode: 5
-  _currentEvent: 0
-  <CanPreview>k__BackingField: 0
-  _animatorController: {fileID: 0}
-  _layerName: 
-  _layerId: -1
---- !u!1 &121188581
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 121188582}
-  - 114: {fileID: 121188583}
-  m_Layer: 0
-  m_Name: Flux.FPlayAnimationEvent
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &121188582
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 121188581}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 173897551}
-  m_RootOrder: 0
---- !u!114 &121188583
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 121188581}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 246962606, guid: 0925728172e9042b89d36127d7238edc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _id: 0
-  _track: {fileID: 173897552}
-  _triggerOnSkip: 0
-  _frameRange:
-    _start: 0
-    _end: 600
-  _hasTriggered: 0
-  _hasFinished: 0
-  _animationClip: {fileID: 0}
-  _controlsAnimation: 0
-  _blendLength: 0
-  _startOffset: 0
-  _stateHash: 0
-  _animator: {fileID: 0}
-  _animTrack: {fileID: 0}
---- !u!1 &155074659
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 155074660}
-  - 114: {fileID: 155074661}
-  m_Layer: 0
-  m_Name: Flux.FPlayAnimationEvent
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &155074660
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 155074659}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 1693757582}
-  m_RootOrder: 0
---- !u!114 &155074661
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 155074659}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 246962606, guid: 0925728172e9042b89d36127d7238edc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _id: 0
-  _track: {fileID: 1693757581}
-  _triggerOnSkip: 0
-  _frameRange:
-    _start: 0
-    _end: 60
-  _hasTriggered: 0
-  _hasFinished: 0
-  _animationClip: {fileID: 7400000, guid: a9883bc85d36c9342b3e6ccc07ffaa1e, type: 2}
-  _controlsAnimation: 1
-  _blendLength: 0
-  _startOffset: 0
-  _stateHash: -186917087
-  _animator: {fileID: 0}
-  _animTrack: {fileID: 0}
---- !u!1 &173897550
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 173897551}
-  - 114: {fileID: 173897552}
-  m_Layer: 0
-  m_Name: Play Animation
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &173897551
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 173897550}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 121188582}
-  m_Father: {fileID: 1724253637}
-  m_RootOrder: 5
---- !u!114 &173897552
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 173897550}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1936026954, guid: 0925728172e9042b89d36127d7238edc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _id: 5
-  _timeline: {fileID: 1724253636}
-  _evtTypeStr: 466c75782e46506c6179416e696d6174696f6e4576656e74
-  _events:
-  - {fileID: 121188583}
-  _alwaysUseCache: 0
-  _cacheMode: 5
-  _currentEvent: 0
-  <CanPreview>k__BackingField: 0
-  _animatorController: {fileID: 0}
-  _layerName: 
-  _layerId: -1
 --- !u!114 &182898321
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -341,11 +129,11 @@ MonoBehaviour:
   EndFrame: 374
   EventInnerColor: {r: 0, g: 0, b: 1, a: 1}
   EventTitleColor: {r: 1, g: 1, b: 1, a: 1}
-  IsActive: 1
+  IsActive: 0
   IsDragged: 0
   IsMinDragged: 0
   IsMaxDragged: 0
-  InitialDraggedPosition: {x: 266, y: 8, z: 0}
+  InitialDraggedPosition: {x: 335, y: 17, z: 0}
   IsDirty: 0
   Clip: {fileID: 0}
   ControlAnimation: 0
@@ -376,58 +164,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
---- !u!1 &276743259
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 276743260}
-  - 114: {fileID: 276743261}
-  m_Layer: 0
-  m_Name: Play Animation
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &276743260
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 276743259}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 593463033}
-  m_Father: {fileID: 1724253637}
-  m_RootOrder: 4
---- !u!114 &276743261
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 276743259}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1936026954, guid: 0925728172e9042b89d36127d7238edc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _id: 4
-  _timeline: {fileID: 1724253636}
-  _evtTypeStr: 466c75782e46506c6179416e696d6174696f6e4576656e74
-  _events:
-  - {fileID: 593463034}
-  _alwaysUseCache: 0
-  _cacheMode: 5
-  _currentEvent: 0
-  <CanPreview>k__BackingField: 0
-  _animatorController: {fileID: 0}
-  _layerName: 
-  _layerId: -1
 --- !u!1 &360561962
 GameObject:
   m_ObjectHideFlags: 0
@@ -504,60 +240,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 3
---- !u!1 &414050583
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 414050585}
-  - 114: {fileID: 414050584}
-  m_Layer: 0
-  m_Name: Flux.FPlayAnimationEvent
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &414050584
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 414050583}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 246962606, guid: 0925728172e9042b89d36127d7238edc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _id: 1
-  _track: {fileID: 1693757581}
-  _triggerOnSkip: 0
-  _frameRange:
-    _start: 61
-    _end: 121
-  _hasTriggered: 0
-  _hasFinished: 0
-  _animationClip: {fileID: 7400000, guid: 7bf87fe906ac2c74da34fc749b5cd151, type: 2}
-  _controlsAnimation: 0
-  _blendLength: 0
-  _startOffset: 0
-  _stateHash: -2082672713
-  _animator: {fileID: 0}
-  _animTrack: {fileID: 0}
---- !u!4 &414050585
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 414050583}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 1693757582}
-  m_RootOrder: 1
 --- !u!114 &417194370
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -570,15 +252,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   EventTitle: Animation
-  StartFrame: 133
-  EndFrame: 309
+  StartFrame: 199
+  EndFrame: 375
   EventInnerColor: {r: 0, g: 0, b: 1, a: 1}
   EventTitleColor: {r: 1, g: 1, b: 1, a: 1}
-  IsActive: 1
+  IsActive: 0
   IsDragged: 0
   IsMinDragged: 0
   IsMaxDragged: 0
-  InitialDraggedPosition: {x: 301, y: 14, z: 0}
+  InitialDraggedPosition: {x: 328, y: 6, z: 0}
   IsDirty: 0
   Clip: {fileID: 0}
   ControlAnimation: 0
@@ -606,60 +288,6 @@ MonoBehaviour:
   IsDirty: 0
   Clip: {fileID: 0}
   ControlAnimation: 0
---- !u!1 &511114166
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 511114167}
-  - 114: {fileID: 511114168}
-  m_Layer: 0
-  m_Name: Flux.FPlayAnimationEvent
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &511114167
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 511114166}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 573715485}
-  m_RootOrder: 0
---- !u!114 &511114168
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 511114166}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 246962606, guid: 0925728172e9042b89d36127d7238edc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _id: 0
-  _track: {fileID: 573715486}
-  _triggerOnSkip: 0
-  _frameRange:
-    _start: 0
-    _end: 600
-  _hasTriggered: 0
-  _hasFinished: 0
-  _animationClip: {fileID: 0}
-  _controlsAnimation: 0
-  _blendLength: 0
-  _startOffset: 0
-  _stateHash: 0
-  _animator: {fileID: 0}
-  _animTrack: {fileID: 0}
 --- !u!114 &525530615
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -672,283 +300,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   EventTitle: Anim
-  StartFrame: 375
-  EndFrame: 509
+  StartFrame: 396
+  EndFrame: 530
   EventInnerColor: {r: 0, g: 0, b: 1, a: 1}
   EventTitleColor: {r: 1, g: 1, b: 1, a: 1}
   IsActive: 0
   IsDragged: 0
   IsMinDragged: 0
   IsMaxDragged: 0
-  InitialDraggedPosition: {x: 420, y: 12, z: 0}
+  InitialDraggedPosition: {x: 441, y: 22, z: 0}
   IsDirty: 0
   Clip: {fileID: 0}
   ControlAnimation: 0
---- !u!1 &573715484
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 573715485}
-  - 114: {fileID: 573715486}
-  m_Layer: 0
-  m_Name: Play Animation
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &573715485
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 573715484}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 511114167}
-  m_Father: {fileID: 1724253637}
-  m_RootOrder: 6
---- !u!114 &573715486
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 573715484}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1936026954, guid: 0925728172e9042b89d36127d7238edc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _id: 6
-  _timeline: {fileID: 1724253636}
-  _evtTypeStr: 466c75782e46506c6179416e696d6174696f6e4576656e74
-  _events:
-  - {fileID: 511114168}
-  _alwaysUseCache: 0
-  _cacheMode: 5
-  _currentEvent: 0
-  <CanPreview>k__BackingField: 0
-  _animatorController: {fileID: 0}
-  _layerName: 
-  _layerId: -1
---- !u!1 &593463032
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 593463033}
-  - 114: {fileID: 593463034}
-  m_Layer: 0
-  m_Name: Flux.FPlayAnimationEvent
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &593463033
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 593463032}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 276743260}
-  m_RootOrder: 0
---- !u!114 &593463034
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 593463032}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 246962606, guid: 0925728172e9042b89d36127d7238edc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _id: 0
-  _track: {fileID: 276743261}
-  _triggerOnSkip: 0
-  _frameRange:
-    _start: 0
-    _end: 600
-  _hasTriggered: 0
-  _hasFinished: 0
-  _animationClip: {fileID: 0}
-  _controlsAnimation: 0
-  _blendLength: 0
-  _startOffset: 0
-  _stateHash: 0
-  _animator: {fileID: 0}
-  _animTrack: {fileID: 0}
---- !u!1 &723766655
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 723766656}
-  - 114: {fileID: 723766657}
-  m_Layer: 0
-  m_Name: Flux.FPlayAnimationEvent
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &723766656
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 723766655}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 1351191082}
-  m_RootOrder: 0
---- !u!114 &723766657
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 723766655}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 246962606, guid: 0925728172e9042b89d36127d7238edc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _id: 0
-  _track: {fileID: 1351191083}
-  _triggerOnSkip: 0
-  _frameRange:
-    _start: 0
-    _end: 600
-  _hasTriggered: 0
-  _hasFinished: 0
-  _animationClip: {fileID: 0}
-  _controlsAnimation: 0
-  _blendLength: 0
-  _startOffset: 0
-  _stateHash: 0
-  _animator: {fileID: 0}
-  _animTrack: {fileID: 0}
---- !u!1 &764431476
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 764431477}
-  - 114: {fileID: 764431478}
-  m_Layer: 0
-  m_Name: Flux.FPlayAnimationEvent
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &764431477
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 764431476}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 1693757582}
-  m_RootOrder: 2
---- !u!114 &764431478
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 764431476}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 246962606, guid: 0925728172e9042b89d36127d7238edc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _id: 2
-  _track: {fileID: 1693757581}
-  _triggerOnSkip: 0
-  _frameRange:
-    _start: 138
-    _end: 600
-  _hasTriggered: 0
-  _hasFinished: 0
-  _animationClip: {fileID: 7406026, guid: cda70ca38a6badd46a2ca8ed1d61ee4a, type: 2}
-  _controlsAnimation: 1
-  _blendLength: 0
-  _startOffset: 0
-  _stateHash: 450215437
-  _animator: {fileID: 0}
-  _animTrack: {fileID: 0}
---- !u!1 &844389058
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 844389060}
-  - 114: {fileID: 844389059}
-  m_Layer: 0
-  m_Name: Default
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &844389059
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 844389058}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 513064439, guid: 0925728172e9042b89d36127d7238edc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _id: 0
-  _sequence: {fileID: 1645764968}
-  _color:
-    r: 0.14
-    g: 0.14
-    b: 0.14
-    a: 0.7
-  _timelines:
-  - {fileID: 1162278445}
-  - {fileID: 1724253636}
---- !u!4 &844389060
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 844389058}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 1162278446}
-  - {fileID: 1724253637}
-  m_Father: {fileID: 1234319796}
-  m_RootOrder: 0
 --- !u!1 &1036251993
 GameObject:
   m_ObjectHideFlags: 0
@@ -993,59 +356,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
---- !u!1 &1057524529
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 1057524530}
-  - 114: {fileID: 1057524531}
-  m_Layer: 0
-  m_Name: Play Animation
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1057524530
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1057524529}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 1586393258}
-  m_Father: {fileID: 1724253637}
-  m_RootOrder: 3
---- !u!114 &1057524531
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1057524529}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1936026954, guid: 0925728172e9042b89d36127d7238edc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _id: 3
-  _timeline: {fileID: 1724253636}
-  _evtTypeStr: 466c75782e46506c6179416e696d6174696f6e4576656e74
-  _events:
-  - {fileID: 1586393259}
-  _alwaysUseCache: 0
-  _cacheMode: 5
-  _currentEvent: 0
-  <CanPreview>k__BackingField: 0
-  _animatorController: {fileID: 0}
-  _layerName: 
-  _layerId: -1
+  m_RootOrder: 4
 --- !u!114 &1121920860
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1086,303 +397,61 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   EventTitle: Animation
   StartFrame: 0
-  EndFrame: 133
+  EndFrame: 123
   EventInnerColor: {r: 0, g: 0, b: 1, a: 1}
   EventTitleColor: {r: 1, g: 1, b: 1, a: 1}
   IsActive: 0
   IsDragged: 0
   IsMinDragged: 0
   IsMaxDragged: 0
-  InitialDraggedPosition: {x: 114, y: 10, z: 0}
+  InitialDraggedPosition: {x: 81, y: 8, z: 0}
   IsDirty: 0
   Clip: {fileID: 0}
   ControlAnimation: 0
---- !u!1 &1162278444
+--- !u!1 &1178805303
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   serializedVersion: 4
   m_Component:
-  - 4: {fileID: 1162278446}
-  - 114: {fileID: 1162278445}
+  - 4: {fileID: 1178805305}
+  - 114: {fileID: 1178805304}
   m_Layer: 0
-  m_Name: Main Camera
+  m_Name: Sequence
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1162278445
+--- !u!114 &1178805304
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1162278444}
+  m_GameObject: {fileID: 1178805303}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 170183720, guid: 0925728172e9042b89d36127d7238edc, type: 3}
+  m_Script: {fileID: 11500000, guid: 8264b785d8da07f48872ea4d593825be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _id: 0
-  _container: {fileID: 844389059}
-  _owner: {fileID: 2114974909}
-  _ownerPath: 2f4d61696e2043616d657261
-  _tracks:
-  - {fileID: 1693757581}
---- !u!4 &1162278446
+  FrameRate: 60
+  Length: 600
+  UpdateTypeMode: 0
+  Objects: []
+  StartMode: 0
+--- !u!4 &1178805305
 Transform:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1162278444}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 1693757582}
-  m_Father: {fileID: 844389060}
-  m_RootOrder: 0
---- !u!1 &1234319795
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 1234319796}
-  m_Layer: 0
-  m_Name: SequenceContent
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1234319796
-Transform:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1234319795}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 844389060}
-  m_Father: {fileID: 1645764969}
-  m_RootOrder: 0
---- !u!1 &1295543956
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 1295543957}
-  - 114: {fileID: 1295543958}
-  m_Layer: 0
-  m_Name: Flux.FPlayAnimationEvent
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1295543957
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1295543956}
+  m_GameObject: {fileID: 1178805303}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 1684344068}
-  m_RootOrder: 0
---- !u!114 &1295543958
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1295543956}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 246962606, guid: 0925728172e9042b89d36127d7238edc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _id: 0
-  _track: {fileID: 1684344069}
-  _triggerOnSkip: 0
-  _frameRange:
-    _start: 0
-    _end: 600
-  _hasTriggered: 0
-  _hasFinished: 0
-  _animationClip: {fileID: 0}
-  _controlsAnimation: 0
-  _blendLength: 0
-  _startOffset: 0
-  _stateHash: 0
-  _animator: {fileID: 0}
-  _animTrack: {fileID: 0}
---- !u!1 &1351191081
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 1351191082}
-  - 114: {fileID: 1351191083}
-  m_Layer: 0
-  m_Name: Play Animation
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1351191082
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1351191081}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 723766656}
-  m_Father: {fileID: 1724253637}
-  m_RootOrder: 1
---- !u!114 &1351191083
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1351191081}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1936026954, guid: 0925728172e9042b89d36127d7238edc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _id: 1
-  _timeline: {fileID: 1724253636}
-  _evtTypeStr: 466c75782e46506c6179416e696d6174696f6e4576656e74
-  _events:
-  - {fileID: 723766657}
-  _alwaysUseCache: 0
-  _cacheMode: 5
-  _currentEvent: 0
-  <CanPreview>k__BackingField: 0
-  _animatorController: {fileID: 0}
-  _layerName: 
-  _layerId: -1
---- !u!1 &1368943813
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 1368943815}
-  - 114: {fileID: 1368943814}
-  m_Layer: 0
-  m_Name: Play Animation
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1368943814
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1368943813}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1936026954, guid: 0925728172e9042b89d36127d7238edc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _id: 7
-  _timeline: {fileID: 1724253636}
-  _evtTypeStr: 466c75782e46506c6179416e696d6174696f6e4576656e74
-  _events:
-  - {fileID: 1478143603}
-  _alwaysUseCache: 0
-  _cacheMode: 5
-  _currentEvent: 0
-  <CanPreview>k__BackingField: 0
-  _animatorController: {fileID: 0}
-  _layerName: 
-  _layerId: -1
---- !u!4 &1368943815
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1368943813}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 1478143604}
-  m_Father: {fileID: 1724253637}
-  m_RootOrder: 7
---- !u!1 &1478143602
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 1478143604}
-  - 114: {fileID: 1478143603}
-  m_Layer: 0
-  m_Name: Flux.FPlayAnimationEvent
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1478143603
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1478143602}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 246962606, guid: 0925728172e9042b89d36127d7238edc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _id: 0
-  _track: {fileID: 1368943814}
-  _triggerOnSkip: 0
-  _frameRange:
-    _start: 0
-    _end: 600
-  _hasTriggered: 0
-  _hasFinished: 0
-  _animationClip: {fileID: 0}
-  _controlsAnimation: 0
-  _blendLength: 0
-  _startOffset: 0
-  _stateHash: 0
-  _animator: {fileID: 0}
-  _animTrack: {fileID: 0}
---- !u!4 &1478143604
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1478143602}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 1368943815}
-  m_RootOrder: 0
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
 --- !u!1 &1518405472
 GameObject:
   m_ObjectHideFlags: 0
@@ -1410,445 +479,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2078692309}
   m_RootOrder: 0
---- !u!1 &1586393257
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 1586393258}
-  - 114: {fileID: 1586393259}
-  m_Layer: 0
-  m_Name: Flux.FPlayAnimationEvent
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1586393258
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1586393257}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 1057524530}
-  m_RootOrder: 0
---- !u!114 &1586393259
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1586393257}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 246962606, guid: 0925728172e9042b89d36127d7238edc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _id: 0
-  _track: {fileID: 1057524531}
-  _triggerOnSkip: 0
-  _frameRange:
-    _start: 0
-    _end: 600
-  _hasTriggered: 0
-  _hasFinished: 0
-  _animationClip: {fileID: 0}
-  _controlsAnimation: 0
-  _blendLength: 0
-  _startOffset: 0
-  _stateHash: 0
-  _animator: {fileID: 0}
-  _animTrack: {fileID: 0}
---- !u!1 &1623175790
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 1623175791}
-  - 114: {fileID: 1623175792}
-  m_Layer: 0
-  m_Name: Flux.FPlayAnimationEvent
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1623175791
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1623175790}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 109444671}
-  m_RootOrder: 0
---- !u!114 &1623175792
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1623175790}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 246962606, guid: 0925728172e9042b89d36127d7238edc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _id: 0
-  _track: {fileID: 109444672}
-  _triggerOnSkip: 0
-  _frameRange:
-    _start: 0
-    _end: 600
-  _hasTriggered: 0
-  _hasFinished: 0
-  _animationClip: {fileID: 0}
-  _controlsAnimation: 0
-  _blendLength: 0
-  _startOffset: 0
-  _stateHash: 0
-  _animator: {fileID: 0}
-  _animTrack: {fileID: 0}
---- !u!1 &1645764967
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 1645764969}
-  - 114: {fileID: 1645764968}
-  m_Layer: 0
-  m_Name: Sequence_000
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1645764968
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1645764967}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 626629194, guid: 0925728172e9042b89d36127d7238edc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _id: -1
-  _content: {fileID: 1234319796}
-  _containers:
-  - {fileID: 844389059}
-  _version: 200
-  _playOnStart: 0
-  _loop: 0
-  _defaultSpeed: 1
-  _speed: 1
-  _updateMode: 0
-  _length: 600
-  _onFinishedCallback:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: 466c75782e53657175656e636546696e69736865644576656e742c20466c75782c2056657273696f6e3d322e302e322e302c2043756c747572653d6e65757472616c2c205075626c69634b6579546f6b656e3d6e756c6c
-    m_CallsDirty: 1
-  _frameRate: 60
-  _inverseFrameRate: 0.016666668
-  _isInit: 0
-  _isPlaying: 0
-  _isPlayingForward: 1
-  _lastUpdateTime: 0
-  _currentFrame: -1
-  _lastFrame: -1
-  _currentTime: -1
-  _watermarkLabelRect:
-    x: 0
-    y: 0
-    width: 0
-    height: 0
-  _watermarkLabelStyle:
-    m_Name: 
-    m_Normal:
-      m_Background: {fileID: 0}
-      m_TextColor:
-        r: 0
-        g: 0
-        b: 0
-        a: 1
-    m_Hover:
-      m_Background: {fileID: 0}
-      m_TextColor:
-        r: 0
-        g: 0
-        b: 0
-        a: 1
-    m_Active:
-      m_Background: {fileID: 0}
-      m_TextColor:
-        r: 0
-        g: 0
-        b: 0
-        a: 1
-    m_Focused:
-      m_Background: {fileID: 0}
-      m_TextColor:
-        r: 0
-        g: 0
-        b: 0
-        a: 1
-    m_OnNormal:
-      m_Background: {fileID: 0}
-      m_TextColor:
-        r: 0
-        g: 0
-        b: 0
-        a: 1
-    m_OnHover:
-      m_Background: {fileID: 0}
-      m_TextColor:
-        r: 0
-        g: 0
-        b: 0
-        a: 1
-    m_OnActive:
-      m_Background: {fileID: 0}
-      m_TextColor:
-        r: 0
-        g: 0
-        b: 0
-        a: 1
-    m_OnFocused:
-      m_Background: {fileID: 0}
-      m_TextColor:
-        r: 0
-        g: 0
-        b: 0
-        a: 1
-    m_Border:
-      m_Left: 0
-      m_Right: 0
-      m_Top: 0
-      m_Bottom: 0
-    m_Margin:
-      m_Left: 0
-      m_Right: 0
-      m_Top: 0
-      m_Bottom: 0
-    m_Padding:
-      m_Left: 0
-      m_Right: 0
-      m_Top: 0
-      m_Bottom: 0
-    m_Overflow:
-      m_Left: 0
-      m_Right: 0
-      m_Top: 0
-      m_Bottom: 0
-    m_Font: {fileID: 0}
-    m_FontSize: 0
-    m_FontStyle: 0
-    m_Alignment: 0
-    m_WordWrap: 0
-    m_RichText: 1
-    m_TextClipping: 0
-    m_ImagePosition: 0
-    m_ContentOffset: {x: 0, y: 0}
-    m_FixedWidth: 0
-    m_FixedHeight: 0
-    m_StretchWidth: 1
-    m_StretchHeight: 0
-  _watermarkEndTime: 0
-  _watermarkAlpha: 0
---- !u!4 &1645764969
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1645764967}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 1234319796}
-  m_Father: {fileID: 0}
-  m_RootOrder: 4
---- !u!1 &1684344067
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 1684344068}
-  - 114: {fileID: 1684344069}
-  m_Layer: 0
-  m_Name: Play Animation
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1684344068
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1684344067}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 1295543957}
-  m_Father: {fileID: 1724253637}
-  m_RootOrder: 0
---- !u!114 &1684344069
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1684344067}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1936026954, guid: 0925728172e9042b89d36127d7238edc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _id: 0
-  _timeline: {fileID: 1724253636}
-  _evtTypeStr: 466c75782e46506c6179416e696d6174696f6e4576656e74
-  _events:
-  - {fileID: 1295543958}
-  _alwaysUseCache: 0
-  _cacheMode: 5
-  _currentEvent: 0
-  <CanPreview>k__BackingField: 0
-  _animatorController: {fileID: 0}
-  _layerName: 
-  _layerId: -1
---- !u!1 &1693757580
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 1693757582}
-  - 114: {fileID: 1693757581}
-  m_Layer: 0
-  m_Name: Play Animation
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1693757581
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1693757580}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1936026954, guid: 0925728172e9042b89d36127d7238edc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _id: 0
-  _timeline: {fileID: 1162278445}
-  _evtTypeStr: 466c75782e46506c6179416e696d6174696f6e4576656e74
-  _events:
-  - {fileID: 155074661}
-  - {fileID: 414050584}
-  - {fileID: 764431478}
-  _alwaysUseCache: 0
-  _cacheMode: 5
-  _currentEvent: 0
-  <CanPreview>k__BackingField: 0
-  _animatorController: {fileID: 9100000, guid: cda70ca38a6badd46a2ca8ed1d61ee4a, type: 2}
-  _layerName: 42617365204c61796572
-  _layerId: 0
---- !u!4 &1693757582
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1693757580}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 155074660}
-  - {fileID: 414050585}
-  - {fileID: 764431477}
-  m_Father: {fileID: 1162278446}
-  m_RootOrder: 0
---- !u!1 &1724253635
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 1724253637}
-  - 114: {fileID: 1724253636}
-  m_Layer: 0
-  m_Name: Sprite
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1724253636
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1724253635}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 170183720, guid: 0925728172e9042b89d36127d7238edc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _id: 1
-  _container: {fileID: 844389059}
-  _owner: {fileID: 360561965}
-  _ownerPath: 2f537072697465
-  _tracks:
-  - {fileID: 1684344069}
-  - {fileID: 1351191083}
-  - {fileID: 109444672}
-  - {fileID: 1057524531}
-  - {fileID: 276743261}
-  - {fileID: 173897552}
-  - {fileID: 573715486}
-  - {fileID: 1368943814}
---- !u!4 &1724253637
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1724253635}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 1684344068}
-  - {fileID: 1351191082}
-  - {fileID: 109444671}
-  - {fileID: 1057524530}
-  - {fileID: 276743260}
-  - {fileID: 173897551}
-  - {fileID: 573715485}
-  - {fileID: 1368943815}
-  m_Father: {fileID: 844389060}
-  m_RootOrder: 1
 --- !u!114 &1724378717
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1861,15 +491,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   EventTitle: Animation
-  StartFrame: 219
-  EndFrame: 275
+  StartFrame: 221
+  EndFrame: 277
   EventInnerColor: {r: 0, g: 0, b: 1, a: 1}
   EventTitleColor: {r: 1, g: 1, b: 1, a: 1}
-  IsActive: 1
+  IsActive: 0
   IsDragged: 0
   IsMinDragged: 0
   IsMaxDragged: 0
-  InitialDraggedPosition: {x: 208, y: 12, z: 0}
+  InitialDraggedPosition: {x: 267, y: 13, z: 0}
   IsDirty: 0
   Clip: {fileID: 0}
   ControlAnimation: 0
@@ -1972,7 +602,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2078692308}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 10, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1518405473}
@@ -2076,8 +706,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2114974903}
-  m_LocalRotation: {x: 0, y: 0.86602545, z: 0, w: 0.49999994}
-  m_LocalPosition: {x: 3.6945841, y: 9.448825, z: -28.09513}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3.8522778, y: -0.31493044, z: -6.9573226}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 2078692309}
@@ -2094,16 +724,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89f70215ed584af469369e6c71dce0f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  EventTitle: Animation
+  EventTitle: Main Camera_GameObject
   StartFrame: 0
-  EndFrame: 70
+  EndFrame: 191
   EventInnerColor: {r: 0, g: 0, b: 1, a: 1}
   EventTitleColor: {r: 1, g: 1, b: 1, a: 1}
-  IsActive: 0
+  IsActive: 1
   IsDragged: 0
   IsMinDragged: 0
   IsMaxDragged: 0
-  InitialDraggedPosition: {x: 39, y: 11, z: 0}
+  InitialDraggedPosition: {x: 58, y: 8, z: 0}
   IsDirty: 0
-  Clip: {fileID: 0}
+  Clip: {fileID: 7400000, guid: a9883bc85d36c9342b3e6ccc07ffaa1e, type: 2}
   ControlAnimation: 0
